@@ -7,7 +7,7 @@
 | Typage strict | `pnpm typecheck` | 0 erreur |
 | Tests unitaires (420 min, répartitions, 329 min participants, minuteur, CSV anti-injection, grille, contenus, seed à jour) | `pnpm test` | 21 tests, 6 fichiers |
 | Build de production | `pnpm build` | ok |
-| Migrations + seed + scénario d'acceptation RLS/RPC | `scripts/db-test.sh` (PostgreSQL 16 local avec shim Supabase) | « ACCEPTATION OK », 80 assertions |
+| Migrations + seed + scénario d'acceptation RLS/RPC | `scripts/db-test.sh` (PostgreSQL 16 local avec shim Supabase) | « ACCEPTATION OK », 79 assertions |
 | Parcours navigateur en mode démo (Playwright, deux onglets : formateur et participant) | script de session, non commité | 27/27 |
 
 Le scénario SQL `supabase/tests/acceptance.sql` est rejouable : il crée cinq
