@@ -62,7 +62,7 @@ describe('contenus pédagogiques', () => {
 
   it('les fiches outils non vérifiées restent « à vérifier »', () => {
     const verified = TOOL_CARDS.filter((t) => t.last_verified_on);
-    expect(verified).toHaveLength(4);
+    expect(verified).toHaveLength(6);
     for (const t of verified) expect(t.verification_source).toMatch(/^https:\/\//);
     for (const t of TOOL_CARDS.filter((t) => !t.last_verified_on)) expect(t.verification_source).toBe('');
     for (const family of ['transcription', 'documents', 'recherche', 'schemas', 'images', 'assistants']) {
