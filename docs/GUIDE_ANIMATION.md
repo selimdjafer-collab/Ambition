@@ -1,5 +1,15 @@
 # Guide d'animation court
 
+Public : permanents d'ETTI d'abord (chargés d'insertion, conseillers en
+insertion professionnelle, chargés de recrutement et de mise à disposition,
+responsables d'agence, assistants administratifs et commerciaux), avec
+ouverture aux ETT et EATT. Chaque atelier part d'une tâche réelle du quotidien
+(compte rendu de suivi et point prescripteur, questions récurrentes sur une
+mission, visite d'entreprise utilisatrice, parcours d'accueil IAE à expliquer,
+support d'agence, courriel de préparation de mission) et affiche où part le
+temps, ce qui est délégable et ce qui doit rester vérifié. Les faits métier
+et outils utilisés sont datés dans `docs/SOURCES_2026.md`.
+
 Parcours de 420 minutes hors pauses : séance 1 (210 min) et séance 2 (210 min),
 le même jour ou sur deux dates. Les pauses et horaires sont gérés hors
 application : ajouter une pause ne réduit jamais les 420 minutes.
@@ -57,6 +67,16 @@ application : ajouter une pause ne réduit jamais les 420 minutes.
 | 9 | Atelier 6 — Comparer deux assistants | 40 | Même prompt, même document ; résultat valable pour cette tâche seulement. |
 | 10 | Défi individuel | 45 | Une variante par personne ; vérifier l'apport individuel. |
 | 11 | Bilan et plan J+7 | 30 | Portfolio, 2–3 outils, un usage à essayer ; gains mesurés ≠ estimés. |
+
+## Faire mesurer le temps sans promettre
+
+Dans les ateliers 1 à 6, le défi données et le défi individuel, la production
+comporte un bloc « Temps sur cette tâche » : temps habituel estimé, temps
+observé pendant l'atelier (préparation, attente, lecture, vérification,
+corrections), case « chronométré » et case « vérification incluse ». Le
+rapport formateur en donne les médianes par atelier en séparant mesures et
+estimations. Rappeler au groupe qu'une mesure sur un document fictif ne vaut
+pas pour le poste : le plan J+7 prévoit de la refaire en situation.
 
 ## Évaluer
 

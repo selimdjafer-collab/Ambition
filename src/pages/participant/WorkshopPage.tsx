@@ -7,6 +7,7 @@ import { TimerDisplay } from '../../components/TimerDisplay';
 import { FileDrop, FileList } from '../../components/production/FileDrop';
 import { PromptBuilder, CopyButton } from '../../components/production/PromptBuilder';
 import { ProductionForm, ProductionReadOnly, wordCount } from '../../components/production/ProductionForms';
+import { TimeMeasureForm } from '../../components/production/TimeMeasure';
 import { Badge, Button, Card, Checkbox, Field, Input, Loading, Markdown, Modal, Notice, SaveIndicator, Textarea, formatDate, formatTime, useToast } from '../../components/ui';
 import { useAsync } from '../../hooks/useAsync';
 import { useSessionData } from '../../hooks/useSessionData';
@@ -220,6 +221,15 @@ export function WorkshopPage() {
           {/* Consigne */}
           <Card title="Objectif et consigne">
             <p className="font-medium text-brand-700">{c.objective}</p>
+            {c.job_context && (
+              <div className="mt-3 rounded-md border border-brand-100 bg-brand-50/60 p-3 text-sm grid gap-2 md:grid-cols-2">
+                <div className="md:col-span-2"><strong>Tâche du quotidien visée :</strong> {c.job_context.task}</div>
+                <div><strong>Où part le temps aujourd’hui :</strong> {c.job_context.time_sinks}</div>
+                <div><strong>Pourquoi ça compte en ETTI :</strong> {c.job_context.why_etti}</div>
+                <div><strong>Délégable à l’assistant :</strong> {c.job_context.delegable}</div>
+                <div><strong>À vérifier ou décider soi-même :</strong> {c.job_context.must_verify}</div>
+              </div>
+            )}
             <Markdown text={c.brief} className="mt-2" />
             {draft && (
               <div className="mt-3 flex flex-wrap gap-2 items-center">
@@ -293,6 +303,7 @@ export function WorkshopPage() {
                   {(id) => <Input id={id} type="url" value={draft.link} disabled={!editable} onChange={(e) => update({ link: e.target.value })} />}
                 </Field>
                 {draft.link && (link ? <p className="text-sm">Lien enregistré : <a href={link} target="_blank" rel="noopener noreferrer nofollow" className="underline text-brand-700 inline-flex items-center gap-1">{hostOf(link)} <ExternalLink size={12} aria-hidden /></a></p> : <p className="text-sm text-red-700">Lien non reconnu (http ou https attendu).</p>)}
+                {c.time_tracking && <TimeMeasureForm extra={draft.extra} onExtra={(extra) => update({ extra })} disabled={!editable} />}
                 <div>
                   <h3 className="font-semibold mb-1">Fichiers (schéma, affiche, capture…)</h3>
                   <FileDrop sessionId={session.id} submissionId={sub.id} files={sub.draft_files} disabled={!editable} onChange={async (files) => { setSub((s) => (s ? { ...s, draft_files: files } : s)); try { const saved = await backend.saveDraft(sub.id, draft, files); lastSaved.current = saved.updated_at; setSaveState('saved'); } catch (e) { setSaveState('error'); toast(e instanceof Error ? e.message : String(e), 'error'); } }} />

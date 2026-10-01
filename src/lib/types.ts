@@ -26,12 +26,12 @@ export type Family =
   | 'assistants';
 
 export const FAMILIES: { key: Family; label: string; verb: string }[] = [
-  { key: 'transcription', label: 'Transcription', verb: 'Transformer un entretien en compte rendu fidèle' },
-  { key: 'documents', label: 'Documents', verb: 'Faire répondre mes documents, avec leurs sources' },
-  { key: 'recherche', label: 'Recherche', verb: 'Préparer une visite avec des sources vérifiées' },
-  { key: 'schemas', label: 'Schémas', verb: 'Rendre un parcours compréhensible en un schéma' },
-  { key: 'images', label: 'Images', verb: 'Créer un support visuel clair et inclusif' },
-  { key: 'assistants', label: 'Assistants', verb: 'Comparer deux assistants et choisir mes outils' },
+  { key: 'transcription', label: 'Transcription', verb: 'Transformer un entretien de suivi en compte rendu fidèle et plan d’action' },
+  { key: 'documents', label: 'Documents', verb: 'Faire répondre les documents de la mission, passages à l’appui' },
+  { key: 'recherche', label: 'Recherche', verb: 'Préparer une visite d’entreprise utilisatrice avec des sources vérifiées' },
+  { key: 'schemas', label: 'Schémas', verb: 'Expliquer le parcours d’accueil IAE en un schéma fidèle' },
+  { key: 'images', label: 'Images', verb: 'Créer un support d’agence clair et inclusif pour les salariés en insertion' },
+  { key: 'assistants', label: 'Assistants', verb: 'Comparer deux assistants sur une tâche réelle et choisir ses outils' },
 ];
 
 export type WorkMode = 'individual' | 'pair' | 'group';
@@ -74,6 +74,20 @@ export interface PromptParts {
   controls: string;
 }
 
+/** Ancrage métier ETTI d'un atelier : tâche réelle, où part le temps, délégable / à vérifier. */
+export interface JobContext {
+  /** La tâche du quotidien d'un permanent d'ETTI visée par l'atelier. */
+  task: string;
+  /** Où part habituellement le temps sur cette tâche (sans IA). */
+  time_sinks: string;
+  /** Ce qui peut être délégué à un assistant IA. */
+  delegable: string;
+  /** Ce qui doit rester vérifié ou décidé par le permanent. */
+  must_verify: string;
+  /** Pourquoi l'usage compte en ETTI (accompagnement, entreprise utilisatrice, prescripteur…). */
+  why_etti: string;
+}
+
 /** Contenu publié d'un atelier (visible des participants quand l'atelier est ouvert). */
 export interface WorkshopContent {
   objective: string;
@@ -106,6 +120,10 @@ export interface WorkshopContent {
   variants?: Variant[];
   /** Note affichée avant tout dépôt. */
   deposit_notice?: string;
+  /** Ancrage métier ETTI et temps (facultatif pour les séquences non productives). */
+  job_context?: JobContext;
+  /** Proposer la mesure du temps habituel / observé (vérification incluse). */
+  time_tracking?: boolean;
 }
 
 /** Contenu publié dans une session : les aides sont servies séparément, selon le niveau révélé. */

@@ -1,4 +1,4 @@
-import type { BreakdownItem, Family, Hint, PublishedWorkshopContent, WorkMode, WorkshopContent } from '../lib/types';
+import type { BreakdownItem, Family, Hint, JobContext, PublishedWorkshopContent, WorkMode, WorkshopContent } from '../lib/types';
 import { FAMILIES } from '../lib/types';
 import { Button, Checkbox, Field, Input, Select, Textarea } from './ui';
 
@@ -32,8 +32,21 @@ export function WorkshopContentForm<T extends PublishedWorkshopContent | Worksho
   const hints = withHints ? ((value as WorkshopContent).hints ?? []) : [];
   const setHint = (i: number, patch: Partial<Hint>) => onChange({ ...value, hints: hints.map((h, j) => (j === i ? { ...h, ...patch } : h)) } as T);
   const pd = value.prompt_defaults;
+  const jc: JobContext = value.job_context ?? { task: '', time_sinks: '', delegable: '', must_verify: '', why_etti: '' };
+  const setJc = (k: keyof JobContext, v: string) => set('job_context', { ...jc, [k]: v } as T['job_context']);
   return (
     <div className="space-y-3">
+      <fieldset className="rounded-md border border-line p-3">
+        <legend className="font-medium px-1">Ancrage métier ETTI et temps</legend>
+        <div className="grid gap-2 md:grid-cols-2">
+          <div className="md:col-span-2"><Field label="Tâche du quotidien visée">{(id) => <Textarea id={id} className="min-h-[3rem]" value={jc.task} onChange={(e) => setJc('task', e.target.value)} />}</Field></div>
+          <Field label="Où part le temps aujourd’hui">{(id) => <Textarea id={id} className="min-h-[3rem]" value={jc.time_sinks} onChange={(e) => setJc('time_sinks', e.target.value)} />}</Field>
+          <Field label="Pourquoi ça compte en ETTI">{(id) => <Textarea id={id} className="min-h-[3rem]" value={jc.why_etti} onChange={(e) => setJc('why_etti', e.target.value)} />}</Field>
+          <Field label="Délégable à l’assistant">{(id) => <Textarea id={id} className="min-h-[3rem]" value={jc.delegable} onChange={(e) => setJc('delegable', e.target.value)} />}</Field>
+          <Field label="À vérifier ou décider soi-même">{(id) => <Textarea id={id} className="min-h-[3rem]" value={jc.must_verify} onChange={(e) => setJc('must_verify', e.target.value)} />}</Field>
+        </div>
+        <div className="mt-2"><Checkbox label="Proposer la mesure du temps habituel / observé dans la production" checked={!!value.time_tracking} onChange={(v) => set('time_tracking', v as T['time_tracking'])} /></div>
+      </fieldset>
       <Field label="Objectif observable">{(id) => <Textarea id={id} className="min-h-[3rem]" value={value.objective} onChange={(e) => set('objective', e.target.value as T['objective'])} />}</Field>
       <Field label="Brief / consigne (markdown simple)">{(id) => <Textarea id={id} className="min-h-[10rem]" value={value.brief} onChange={(e) => set('brief', e.target.value as T['brief'])} />}</Field>
       <div className="grid gap-3 md:grid-cols-2">

@@ -105,16 +105,16 @@ export const DEMO_TRAINER_EMAIL = 'formatrice.demo@exemple.test';
 export const DEMO_PASSWORD = 'demo';
 
 const DEMO_PARTICIPANTS: { name: string; email: string; job: string }[] = [
-  { name: 'Amel D. (démo)', email: 'amel.demo@exemple.test', job: 'Chargée de recrutement' },
-  { name: 'Bastien L. (démo)', email: 'bastien.demo@exemple.test', job: 'Conseiller en insertion' },
-  { name: 'Chloé M. (démo)', email: 'chloe.demo@exemple.test', job: 'Responsable d’agence' },
-  { name: 'David R. (démo)', email: 'david.demo@exemple.test', job: 'Assistant administratif' },
-  { name: 'Elena P. (démo)', email: 'elena.demo@exemple.test', job: 'Chargée d’affaires' },
-  { name: 'Farid K. (démo)', email: 'farid.demo@exemple.test', job: 'Chargé de recrutement' },
-  { name: 'Gaëlle T. (démo)', email: 'gaelle.demo@exemple.test', job: 'Conseillère en insertion' },
-  { name: 'Hugo B. (démo)', email: 'hugo.demo@exemple.test', job: 'Commercial' },
-  { name: 'Inès S. (démo)', email: 'ines.demo@exemple.test', job: 'Assistante d’agence' },
-  { name: 'Julien V. (démo)', email: 'julien.demo@exemple.test', job: 'Responsable de secteur' },
+  { name: 'Amel D. (démo)', email: 'amel.demo@exemple.test', job: 'Chargée d’insertion et de mise à disposition (ETTI)' },
+  { name: 'Bastien L. (démo)', email: 'bastien.demo@exemple.test', job: 'Conseiller en insertion professionnelle (ETTI)' },
+  { name: 'Chloé M. (démo)', email: 'chloe.demo@exemple.test', job: 'Responsable d’agence ETTI' },
+  { name: 'David R. (démo)', email: 'david.demo@exemple.test', job: 'Assistant administratif (paie, reporting ASP)' },
+  { name: 'Elena P. (démo)', email: 'elena.demo@exemple.test', job: 'Chargée de relations entreprises utilisatrices' },
+  { name: 'Farid K. (démo)', email: 'farid.demo@exemple.test', job: 'Chargé de recrutement et de sourcing IAE' },
+  { name: 'Gaëlle T. (démo)', email: 'gaelle.demo@exemple.test', job: 'Conseillère en insertion (levée des freins)' },
+  { name: 'Hugo B. (démo)', email: 'hugo.demo@exemple.test', job: 'Chargé de développement (clauses d’insertion)' },
+  { name: 'Inès S. (démo)', email: 'ines.demo@exemple.test', job: 'Assistante d’agence (contrats de mission)' },
+  { name: 'Julien V. (démo)', email: 'julien.demo@exemple.test', job: 'Responsable de secteur ETT / ETTI' },
 ];
 
 function buildDemoDb(): DB {
@@ -227,7 +227,7 @@ function buildDemoDb(): DB {
       comfort: ((i % 4) + 1) as 1 | 2 | 3 | 4,
       used_ai_before: (['never', 'sometimes', 'often'] as const)[i % 3],
       job: DEMO_PARTICIPANTS[i].job,
-      priority_task: ['Rédiger les comptes rendus d’entretien', 'Préparer les visites d’entreprise', 'Répondre aux questions sur les missions', 'Créer des supports pour l’agence', 'Rédiger des courriels de suivi'][i % 5],
+      priority_task: ['Rédiger les comptes rendus d’entretien de suivi et préparer le point prescripteur', 'Préparer les visites d’entreprises utilisatrices', 'Répondre aux questions récurrentes sur les missions', 'Créer des supports d’agence pour les salariés en insertion', 'Rédiger les courriels de préparation de mission'][i % 5],
       expectations: 'Gagner en assurance sur une tâche précise et savoir ce que je dois vérifier.',
     },
     tool_access: {},
@@ -288,6 +288,7 @@ function buildDemoDb(): DB {
         { action: 'Demander la rémunération', owner: 'Conseillère', due: '2026-09-24' },
       ],
       correction_v1_v2: i === 1 ? '' : 'V1 présentait la mission comme confirmée ; V2 précise « à confirmer par le client » car la transcription ne contient aucune confirmation.',
+      time: { usual_minutes: String(25 + i * 5), observed_minutes: String(14 + i * 3), includes_verification: i !== 1, measured: i < 3, note: i === 0 ? 'Le plus long : relire chaque date dans la transcription.' : '' },
     });
     const versions = status === 'draft' ? 0 : i === 0 ? 2 : 1;
     submissions.push({ id, session_id: sessionId, session_workshop_id: a1.id, owner_id: members[0], team_id: team.id, status, current_version: versions, draft: content, draft_files: [], share_consent: i === 0, updated_at: iso(-30 + i), updated_by: members[i % 2], submitted_at: versions ? iso(-35 + i) : null, created_at: iso(-55) });

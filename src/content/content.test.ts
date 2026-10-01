@@ -19,6 +19,17 @@ describe('contenus pédagogiques', () => {
     expect(PROGRAM_OBJECTIVES).toHaveLength(7);
   });
 
+  it('chaque séquence est ancrée dans le métier ETTI et les ateliers proposent la mesure du temps', () => {
+    for (const w of WORKSHOPS) {
+      const jc = w.content.job_context;
+      expect(jc, w.code).toBeDefined();
+      for (const k of ['task', 'time_sinks', 'delegable', 'must_verify', 'why_etti'] as const) expect(jc![k].length, `${w.code}.${k}`).toBeGreaterThan(20);
+    }
+    for (const code of ['DEF', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'DI']) expect(WORKSHOPS.find((w) => w.code === code)?.content.time_tracking, code).toBe(true);
+    const all = JSON.stringify(WORKSHOPS);
+    for (const term of ['entreprise utilisatrice', 'prescripteur', 'PASS IAE', 'parcours d’insertion']) expect(all.toLowerCase(), term).toContain(term.toLowerCase());
+  });
+
   it('le défi données a 8 cartes et le défi individuel des variantes', () => {
     expect(WORKSHOPS.find((w) => w.code === 'DEF')?.content.data_cards).toHaveLength(8);
     expect((WORKSHOPS.find((w) => w.code === 'DI')?.content.variants ?? []).length).toBeGreaterThanOrEqual(3);
@@ -32,11 +43,12 @@ describe('contenus pédagogiques', () => {
     expect(all).not.toMatch(/tous les usages sont gratuits/i);
     expect(all).not.toMatch(/éligible(?:s)? (?:au )?CPF/i);
     expect(all).not.toMatch(/580\s?(?:€|euros)/);
+    expect(all).not.toMatch(/trois heures par (?:semaine|entretien)/i);
   });
 
   it('les ressources fictives sont marquées et datées de septembre 2026 ; R3 est obsolète ; R8 réservée au formateur', () => {
     const codes = RESOURCES.map((r) => r.code);
-    expect(codes).toEqual(['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8']);
+    expect(codes).toEqual(['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10']);
     for (const r of RESOURCES) {
       expect(r.fictional).toBe(true);
       expect(r.body).toContain('CAS FICTIF');

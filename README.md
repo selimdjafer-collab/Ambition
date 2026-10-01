@@ -18,7 +18,15 @@ distincts.
   répartitions, objectifs observables, briefs, étapes, livrables, grilles de
   réussite, trois niveaux d'aide, corrigés privés, questions de débrief et
   solutions de secours sans API d'IA.
-- **Cas fictif « Agence Horizon »** : ressources R1 à R7 consultables et
+- **Ancrage métier ETTI** : chaque séquence vise une tâche réelle d'un
+  permanent d'agence d'intérim d'insertion (suivi de mission et point
+  prescripteur, questions sur une mission, visite d'entreprise utilisatrice,
+  parcours d'accueil IAE, support d'agence, courriel de préparation de
+  mission), indique où part le temps, ce qui est délégable et ce qui reste à
+  vérifier, et fait mesurer le temps observé sans promesse générale. Faits
+  métier et outils datés dans `docs/SOURCES_2026.md`.
+- **Cas fictif « Agence Horizon » (ETTI fictive)** : ressources R1 à R7, R9
+  (fiche de liaison prescripteur) et R10 (lexique ETTI), consultables et
   téléchargeables, marquées « CAS FICTIF — FORMATION », plus un compte rendu
   imparfait réservé au formateur (R8).
 - **Bibliothèque d'outils** éditable et versionnée (six familles, solutions de
@@ -75,6 +83,7 @@ correspondance avec les douze parcours attendus sont décrits dans
 - [docs/GUIDE_ANIMATION.md](docs/GUIDE_ANIMATION.md) — guide d'animation court, séquence par séquence.
 - [docs/SECURITE_ET_DONNEES.md](docs/SECURITE_ET_DONNEES.md) — permissions, stockage, confidentialité, limites.
 - [docs/VERIFICATION.md](docs/VERIFICATION.md) — scénarios de vérification et limites connues.
+- [docs/SOURCES_2026.md](docs/SOURCES_2026.md) — faits métier ETTI et outils vérifiés au 01/10/2026, avec sources.
 
 ## Structure
 

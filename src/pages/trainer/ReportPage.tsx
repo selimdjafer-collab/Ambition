@@ -8,6 +8,14 @@ import { useSessionData } from '../../hooks/useSessionData';
 import { downloadText, toCsv } from '../../lib/csv';
 import { deriveStatus, openHelpFor, submissionFor } from '../../lib/status';
 import { PARTICIPANT_STATUS_LABELS } from '../../lib/types';
+import { readTime } from '../../components/production/TimeMeasure';
+
+function median(xs: number[]): number | null {
+  if (!xs.length) return null;
+  const s = [...xs].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) / 2);
+}
 
 export function ReportPage() {
   const { sessionId } = useParams();
@@ -76,6 +84,29 @@ export function ReportPage() {
             </table>
           </div>
           <p className="text-xs text-muted mt-2">Statuts calculés sur les actions réelles. Les évaluations sont formatives et portent sur la tâche observée ; elles ne prouvent pas la maîtrise des six familles d’usage.</p>
+        </Card>
+        <Card title="Temps déclarés sur les tâches (mesures, pas promesses)">
+          <p className="text-xs text-muted mb-2">Temps saisis par les participants pour la tâche fictive de chaque atelier. Ils valent pour cette tâche, ce document et cet outil ; ils ne sont pas généralisables au poste. Seules les durées « chronométrées » sont des mesures ; les autres sont des estimations.</p>
+          <table className="text-sm w-full">
+            <thead><tr className="text-left border-b border-line"><th className="py-1 pr-2">Atelier</th><th className="pr-2">Réponses</th><th className="pr-2">Chronométrées</th><th className="pr-2">Habituel (médiane, min)</th><th className="pr-2">Observé (médiane, min)</th><th>Vérification incluse</th></tr></thead>
+            <tbody>
+              {workshops.filter((w) => w.content.time_tracking).map((w) => {
+                const times = data.submissions.filter((s) => s.session_workshop_id === w.id && s.current_version > 0).map((s) => readTime(s.draft.extra ?? {})).filter((t) => t.usual_minutes || t.observed_minutes);
+                const usual = times.map((t) => Number(t.usual_minutes)).filter((n) => n > 0);
+                const observed = times.map((t) => Number(t.observed_minutes)).filter((n) => n > 0);
+                return (
+                  <tr key={w.id} className="border-b border-line">
+                    <td className="py-1 pr-2">{w.code} — {w.title}</td>
+                    <td className="pr-2">{times.length}</td>
+                    <td className="pr-2">{times.filter((t) => t.measured).length}</td>
+                    <td className="pr-2">{median(usual) ?? '—'}</td>
+                    <td className="pr-2">{median(observed) ?? '—'}</td>
+                    <td>{times.filter((t) => t.includes_verification).length} / {times.length}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </Card>
         <Card title="Demandes d’aide">
           {data.helpRequests.length === 0 ? <p className="text-sm text-muted">Aucune.</p> : <ul className="text-sm space-y-1">{data.helpRequests.map((h) => <li key={h.id}>{formatTime(h.created_at)} · {profileName(h.requester_id)} · {workshops.find((w) => w.id === h.session_workshop_id)?.code ?? '—'} · {h.reason} · {h.status === 'resolved' ? `résolu ${formatTime(h.resolved_at)}` : h.status}</li>)}</ul>}

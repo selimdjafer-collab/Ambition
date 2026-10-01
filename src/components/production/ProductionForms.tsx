@@ -448,6 +448,13 @@ export function ProductionReadOnly({ content, extra }: { content: PublishedWorks
     target: 'Entreprise / secteur', territory: 'Territoire', facts: 'Faits sourcés', hypotheses: 'Hypothèses', questions: 'Questions client', uncertainties: 'Incertitudes', sources: 'Sources', verification: 'Vérification', partial: 'Production partielle',
     blocks: 'Six blocs', visual_choice: 'Choix visuel', peer_check: 'Contrôle par un pair', messages: 'Messages', image_description: 'Description de l’image', alt_text: 'Texte alternatif', accessible_text: 'Texte accessible', rights: 'Droits', checks: 'Contrôles',
     assistant_a: 'Assistant A', assistant_b: 'Assistant B', scores: 'Comparaison', decision: 'Décision', variant_id: 'Variante', fields: 'Défi individuel', kept: 'Retenu', revisit: 'À revoir', next: 'Prochaine fois',
+    time: 'Temps sur la tâche',
+  };
+  const renderTime = (v: unknown) => {
+    const t = (v ?? {}) as Record<string, unknown>;
+    const usual = t.usual_minutes ? `${t.usual_minutes} min habituelles (estimation)` : 'temps habituel non renseigné';
+    const observed = t.observed_minutes ? `${t.observed_minutes} min observées${t.measured ? ' (chronométrées)' : ' (estimées)'}${t.includes_verification ? ', vérification incluse' : ', vérification non incluse'}` : 'temps observé non renseigné';
+    return `${usual} · ${observed}${t.note ? `\n${String(t.note)}` : ''}`;
   };
   const variantTitle = (id: unknown) => content.variants?.find((v) => v.id === id)?.title ?? String(id);
   return (
@@ -455,7 +462,7 @@ export function ProductionReadOnly({ content, extra }: { content: PublishedWorks
       {entries.map(([k, v]) => (
         <div key={k} className="grid md:grid-cols-[12rem_1fr] gap-1 border-b border-line pb-1">
           <dt className="font-semibold">{labels[k] ?? k}</dt>
-          <dd className="whitespace-pre-wrap">{k === 'variant_id' ? variantTitle(v) : k === 'sort' ? Object.entries(v as Record<string, string>).map(([cid, choice]) => `${content.data_cards?.find((c) => c.id === cid)?.label ?? cid} : ${choice === 'ok' ? 'transmissible' : choice === 'conditions' ? 'selon conditions' : choice === 'non' ? 'à ne pas transmettre' : '—'}`).join('\n') : render(v)}</dd>
+          <dd className="whitespace-pre-wrap">{k === 'time' ? renderTime(v) : k === 'variant_id' ? variantTitle(v) : k === 'sort' ? Object.entries(v as Record<string, string>).map(([cid, choice]) => `${content.data_cards?.find((c) => c.id === cid)?.label ?? cid} : ${choice === 'ok' ? 'transmissible' : choice === 'conditions' ? 'selon conditions' : choice === 'non' ? 'à ne pas transmettre' : '—'}`).join('\n') : render(v)}</dd>
         </div>
       ))}
     </dl>
