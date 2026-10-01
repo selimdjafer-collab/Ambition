@@ -189,14 +189,16 @@ create trigger help_requests_log after insert or update on public.help_requests 
 create trigger sessions_log after update on public.sessions for each row execute function public.log_status_change();
 
 -- -----------------------------------------------------------------------------
--- Garde-fous sur les mises à jour des participants
+-- Garde-fous sur les mises à jour directes des participants (rôles clients).
+-- Les fonctions security definer (request_join, submit_submission, …)
+-- s'exécutent sous leur propriétaire et ne sont pas concernées.
 -- -----------------------------------------------------------------------------
 create or replace function public.guard_enrollment_update()
 returns trigger
 language plpgsql
 as $$
 begin
-  if not public.is_session_trainer(old.session_id) then
+  if current_user in ('anon', 'authenticated') and not public.is_session_trainer(old.session_id) then
     if new.status is distinct from old.status
        or new.user_id is distinct from old.user_id
        or new.session_id is distinct from old.session_id
@@ -215,7 +217,7 @@ returns trigger
 language plpgsql
 as $$
 begin
-  if not public.is_session_trainer(old.session_id) then
+  if current_user in ('anon', 'authenticated') and not public.is_session_trainer(old.session_id) then
     if new.status is distinct from old.status
        or new.current_version is distinct from old.current_version
        or new.owner_id is distinct from old.owner_id
@@ -225,7 +227,8 @@ begin
        or new.submitted_at is distinct from old.submitted_at then
       raise exception 'Modification refusée : utilisez la remise pour changer le statut';
     end if;
-    if old.status = 'validated' then
+    -- Une production validée n'est plus modifiable (l'accord de partage reste réglable).
+    if old.status = 'validated' and (new.draft is distinct from old.draft or new.draft_files is distinct from old.draft_files) then
       raise exception 'Production validée : créez une nouvelle version après retour du formateur';
     end if;
   end if;

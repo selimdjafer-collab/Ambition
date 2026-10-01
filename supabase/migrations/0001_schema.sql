@@ -44,13 +44,17 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- Un utilisateur ne peut pas changer son propre rôle.
+-- Un utilisateur ne peut pas changer son propre rôle. Seuls un formateur
+-- (via set_user_role) ou le rôle service (bootstrap_trainer, éditeur SQL)
+-- peuvent le faire ; les rôles clients anon/authenticated sont bloqués.
 create or replace function public.protect_profile_role()
 returns trigger
 language plpgsql
 as $$
 begin
-  if new.role is distinct from old.role and not public.is_trainer() then
+  if new.role is distinct from old.role
+     and current_user in ('anon', 'authenticated')
+     and not public.is_trainer() then
     raise exception 'Modification du rôle refusée';
   end if;
   if new.id <> old.id or new.email <> old.email then
@@ -144,7 +148,7 @@ create table public.tool_cards (
   official_url text not null default '',
   usage text not null default '',
   quick_start text not null default '',
-  authorization text not null default 'to_validate' check (authorization in ('authorized', 'to_validate', 'not_authorized')),
+  authorization_status text not null default 'to_validate' check (authorization_status in ('authorized', 'to_validate', 'not_authorized')),
   account_required text not null default '',
   pricing_status text not null default 'unknown' check (pricing_status in ('free', 'free_with_quota', 'trial', 'license', 'depends_on_account', 'unknown')),
   pricing_note text not null default '',

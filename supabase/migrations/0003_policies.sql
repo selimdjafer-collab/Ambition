@@ -121,8 +121,10 @@ create policy team_members_write on public.team_members for all to authenticated
   with check (exists (select 1 from public.teams t where t.id = team_id and public.is_session_trainer(t.session_id)));
 
 -- productions -----------------------------------------------------------------
+-- (conditions écrites en ligne : une fonction stable lisant la même table ne
+-- verrait pas la ligne en cours d'insertion lors d'un RETURNING)
 create policy submissions_select on public.submissions for select to authenticated
-  using (public.can_read_submission(id));
+  using (owner_id = auth.uid() or (team_id is not null and public.is_team_member(team_id)) or public.is_session_trainer(session_id));
 create policy submissions_insert on public.submissions for insert to authenticated
   with check (
     owner_id = auth.uid()
@@ -133,8 +135,8 @@ create policy submissions_insert on public.submissions for insert to authenticat
     and exists (select 1 from public.sessions s where s.id = session_id and s.status = 'open')
   );
 create policy submissions_update on public.submissions for update to authenticated
-  using (public.can_edit_submission(id) or public.is_session_trainer(session_id))
-  with check (public.can_edit_submission(id) or public.is_session_trainer(session_id));
+  using (owner_id = auth.uid() or (team_id is not null and public.is_team_member(team_id)) or public.is_session_trainer(session_id))
+  with check (owner_id = auth.uid() or (team_id is not null and public.is_team_member(team_id)) or public.is_session_trainer(session_id));
 create policy submissions_delete on public.submissions for delete to authenticated
   using (public.is_session_trainer(session_id));
 

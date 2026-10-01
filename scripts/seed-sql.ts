@@ -75,7 +75,7 @@ export function buildSeedSql(): string {
   lines.push('-- Bibliothèque d’outils (non écrasée si déjà modifiée)');
   for (const t of TOOL_CARDS) {
     lines.push(
-      `insert into public.tool_cards (family, name, official_url, usage, quick_start, authorization, account_required, pricing_status, pricing_note, limits, formats, precautions, terms_url, privacy_url, fallback, last_verified_on, verification_source, is_fallback) values (${lit(t.family)}, ${lit(t.name)}, ${lit(t.official_url)}, ${lit(t.usage)}, ${lit(t.quick_start)}, ${lit(t.authorization)}, ${lit(t.account_required)}, ${lit(t.pricing_status)}, ${lit(t.pricing_note)}, ${lit(t.limits)}, ${lit(t.formats)}, ${lit(t.precautions)}, ${lit(t.terms_url)}, ${lit(t.privacy_url)}, ${lit(t.fallback)}, ${t.last_verified_on ? lit(t.last_verified_on) : 'null'}, ${lit(t.verification_source)}, ${t.is_fallback})\n  on conflict (family, name) do nothing;`,
+      `insert into public.tool_cards (family, name, official_url, usage, quick_start, authorization_status, account_required, pricing_status, pricing_note, limits, formats, precautions, terms_url, privacy_url, fallback, last_verified_on, verification_source, is_fallback) values (${lit(t.family)}, ${lit(t.name)}, ${lit(t.official_url)}, ${lit(t.usage)}, ${lit(t.quick_start)}, ${lit(t.authorization_status)}, ${lit(t.account_required)}, ${lit(t.pricing_status)}, ${lit(t.pricing_note)}, ${lit(t.limits)}, ${lit(t.formats)}, ${lit(t.precautions)}, ${lit(t.terms_url)}, ${lit(t.privacy_url)}, ${lit(t.fallback)}, ${t.last_verified_on ? lit(t.last_verified_on) : 'null'}, ${lit(t.verification_source)}, ${t.is_fallback})\n  on conflict (family, name) do nothing;`,
     );
   }
   lines.push('');

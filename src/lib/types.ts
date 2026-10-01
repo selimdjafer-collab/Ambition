@@ -209,7 +209,7 @@ export interface ToolCard {
   official_url: string;
   usage: string;
   quick_start: string;
-  authorization: ToolAuthorization;
+  authorization_status: ToolAuthorization;
   account_required: string;
   pricing_status: PricingStatus;
   pricing_note: string;

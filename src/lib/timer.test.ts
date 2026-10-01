@@ -16,7 +16,7 @@ describe('minuteur partagé', () => {
   });
 
   it('pause, reprise, prolongation et fin', () => {
-    let t = applyTimerAction(IDLE_TIMER, 'start', 600, null, t0);
+    let t = applyTimerAction(IDLE_TIMER, 'start', 600, undefined, t0);
     t = applyTimerAction(t, 'pause', undefined, undefined, t0 + 100_000);
     expect(t.status).toBe('paused');
     expect(t.remaining_seconds).toBe(500);
