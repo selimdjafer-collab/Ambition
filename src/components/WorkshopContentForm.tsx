@@ -1,4 +1,6 @@
 import type { BreakdownItem, Family, Hint, JobContext, PublishedWorkshopContent, WorkMode, WorkshopContent } from '../lib/types';
+import { ToolSpecForm } from './toolbox/ToolSpecForm';
+import { EMPTY_BLUEPRINT } from './toolbox/toolbox';
 import { FAMILIES } from '../lib/types';
 import { Button, Checkbox, Field, Input, Select, Textarea } from './ui';
 
@@ -76,6 +78,17 @@ export function WorkshopContentForm<T extends PublishedWorkshopContent | Worksho
             <Field key={k} label={{ context: 'Contexte', task: 'Tâche', data: 'Données autorisées', constraints: 'Contraintes', format: 'Format attendu', controls: 'Contrôles' }[k]}>{(id) => <Textarea id={id} className="min-h-[3rem]" value={pd[k]} onChange={(e) => set('prompt_defaults', { ...pd, [k]: e.target.value } as T['prompt_defaults'])} />}</Field>
           ))}
         </div>
+      </fieldset>
+      <fieldset className="rounded-md border border-line p-3">
+        <legend className="font-medium px-1">Modèle d’outil de départ (boîte à outils)</legend>
+        {value.tool_blueprint ? (
+          <>
+            <ToolSpecForm value={{ ...value.tool_blueprint, tool_used: '', deploy_plan: '' }} onChange={(v) => { const { tool_used: _t, deploy_plan: _d, ...bp } = v; set('tool_blueprint', bp as T['tool_blueprint']); }} />
+            <Button size="sm" variant="danger" className="mt-2" onClick={() => set('tool_blueprint', undefined as T['tool_blueprint'])}>Retirer le modèle d’outil</Button>
+          </>
+        ) : (
+          <Button size="sm" onClick={() => set('tool_blueprint', { ...EMPTY_BLUEPRINT, family: value.families[0] ?? 'assistants' } as T['tool_blueprint'])}>Ajouter un modèle d’outil</Button>
+        )}
       </fieldset>
       {withHints && (
         <fieldset className="rounded-md border border-line p-3">

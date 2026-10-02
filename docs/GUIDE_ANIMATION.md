@@ -1,5 +1,11 @@
 # Guide d'animation court
 
+Module 2 : les participants ont suivi le module 1 (bases du prompt, vigilance
+sur les données, vérification). Ne pas réexpliquer les bases : chaque atelier
+sert à construire un outil réutilisable, à le tester sur le cas fictif et à
+le documenter pour l'agence. À la fin, chacun repart avec sa boîte à outils
+(fiches exportables) et un plan de déploiement à J+7.
+
 Public : permanents d'ETTI d'abord (chargés d'insertion, conseillers en
 insertion professionnelle, chargés de recrutement et de mise à disposition,
 responsables d'agence, assistants administratifs et commerciaux), avec
@@ -67,6 +73,26 @@ application : ajouter une pause ne réduit jamais les 420 minutes.
 | 9 | Atelier 6 — Comparer deux assistants | 40 | Même prompt, même document ; résultat valable pour cette tâche seulement. |
 | 10 | Défi individuel | 45 | Une variante par personne ; vérifier l'apport individuel. |
 | 11 | Bilan et plan J+7 | 30 | Portfolio, 2–3 outils, un usage à essayer ; gains mesurés ≠ estimés. |
+
+## Faire construire des outils, pas des réponses
+
+- Dans chaque atelier, la carte « Mon outil » donne le modèle de départ.
+  Le participant clique « Enregistrer dans ma boîte à outils », adapte les
+  instructions permanentes et le message type à sa structure, puis teste.
+- Le banc d'essai (« Tester sur le cas fictif ») remplit les emplacements
+  `{{…}}`, compose le message à coller dans l'outil externe, et fait consigner
+  le verdict (OK ou à corriger), le temps passé vérification comprise et la
+  correction apportée. Un outil sans test reste « en construction ».
+- « Enregistrer comme nouvelle version » conserve la version précédente : un
+  outil s'améliore au fil des tests.
+- Au bilan, le participant marque ses outils « prêts à proposer », autorise
+  ou non le partage, et exporte sa boîte en markdown. Vous commentez, validez
+  (après avoir lu la fiche et au moins un test) et publiez au groupe les
+  outils autorisés. L'export markdown du groupe (prêts et validés) sert de
+  livrable collectif.
+- Rappel constant : un outil validé en formation sur le cas fictif n'est pas
+  autorisé sur des données réelles ; les règles de données et le plan de
+  déploiement de la fiche servent à obtenir cette validation dans la structure.
 
 ## Faire mesurer le temps sans promettre
 

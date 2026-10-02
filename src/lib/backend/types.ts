@@ -34,6 +34,9 @@ import type {
   TimerState,
   ToolCard,
   ToolCardHistory,
+  ToolboxItem,
+  ToolboxShared,
+  ToolboxTest,
   WorkshopPrivateContent,
   WorkshopTemplate,
   WorkshopPrivate,
@@ -82,7 +85,9 @@ export type RealtimeTable =
   | 'polls'
   | 'poll_answers'
   | 'ideas'
-  | 'shared_examples';
+  | 'shared_examples'
+  | 'toolbox_items'
+  | 'toolbox_shared';
 
 export type SessionWorkshopStatePatch = Partial<
   Pick<SessionWorkshop, 'status' | 'hints_revealed' | 'answer_key_revealed'>
@@ -107,6 +112,9 @@ export type SessionPatch = Partial<
 >;
 
 export type ToolCardInput = Omit<ToolCard, 'id' | 'version' | 'updated_at'>;
+
+export type ToolboxItemInput = Omit<ToolboxItem, 'id' | 'owner_id' | 'status' | 'version' | 'history' | 'tests' | 'trainer_comment' | 'created_at' | 'updated_at' | 'updated_by'>;
+export type ToolboxItemPatch = Partial<Omit<ToolboxItem, 'id' | 'session_id' | 'owner_id' | 'created_at' | 'updated_at' | 'updated_by' | 'history' | 'tests' | 'version'>>;
 
 /**
  * Contrat commun aux deux implémentations :
@@ -263,6 +271,17 @@ export interface Backend {
   listIdeas(sessionId: string): Promise<Idea[]>;
   addIdea(sessionId: string, text: string): Promise<void>;
   deleteIdea(id: string): Promise<void>;
+
+  // --- Boîte à outils --------------------------------------------------------
+  listToolboxItems(sessionId: string): Promise<ToolboxItem[]>;
+  createToolboxItem(input: ToolboxItemInput): Promise<ToolboxItem>;
+  /** Met à jour la fiche ; avec newVersion, archive l'état précédent dans l'historique et incrémente la version. */
+  updateToolboxItem(id: string, patch: ToolboxItemPatch, newVersion?: boolean): Promise<ToolboxItem>;
+  addToolboxTest(id: string, test: ToolboxTest): Promise<ToolboxItem>;
+  deleteToolboxItem(id: string): Promise<void>;
+  listToolboxShared(sessionId: string): Promise<ToolboxShared[]>;
+  publishToolboxItem(id: string, title: string): Promise<void>;
+  deleteToolboxShared(id: string): Promise<void>;
 
   // --- Plans d'application --------------------------------------------------
   getMyActionPlan(sessionId: string): Promise<ActionPlan | null>;

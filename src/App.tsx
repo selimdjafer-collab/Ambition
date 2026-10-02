@@ -8,6 +8,8 @@ import { WorkshopPage } from './pages/participant/WorkshopPage';
 import { PortfolioPage } from './pages/participant/PortfolioPage';
 import { ActionPlanPage } from './pages/participant/ActionPlanPage';
 import { MyDataPage } from './pages/participant/MyDataPage';
+import { ToolboxPage } from './pages/participant/ToolboxPage';
+import { TrainerToolboxPage } from './pages/trainer/TrainerToolboxPage';
 import { ResourcesPage } from './pages/shared/ResourcesPage';
 import { ToolsPage } from './pages/shared/ToolsPage';
 import { TrainerSessionsPage } from './pages/trainer/TrainerSessionsPage';
@@ -55,6 +57,7 @@ export default function App() {
           <Route path="/p/sessions/:sessionId/ateliers/:workshopId" element={<RequireAuth role="participant"><WorkshopPage /></RequireAuth>} />
           <Route path="/p/sessions/:sessionId/portfolio" element={<RequireAuth role="participant"><PortfolioPage /></RequireAuth>} />
           <Route path="/p/sessions/:sessionId/plan" element={<RequireAuth role="participant"><ActionPlanPage /></RequireAuth>} />
+          <Route path="/p/sessions/:sessionId/boite" element={<RequireAuth role="participant"><ToolboxPage /></RequireAuth>} />
 
           <Route path="/t/sessions" element={<RequireAuth role="trainer"><TrainerSessionsPage /></RequireAuth>} />
           <Route path="/t/sessions/:sessionId/preparer" element={<RequireAuth role="trainer"><SessionPreparePage /></RequireAuth>} />
@@ -63,6 +66,7 @@ export default function App() {
           <Route path="/t/sessions/:sessionId/presentation" element={<RequireAuth role="trainer"><PresentationPage /></RequireAuth>} />
           <Route path="/t/sessions/:sessionId/ateliers/:workshopId/modifier" element={<RequireAuth role="trainer"><SessionWorkshopEditPage /></RequireAuth>} />
           <Route path="/t/sessions/:sessionId/rapport" element={<RequireAuth role="trainer"><ReportPage /></RequireAuth>} />
+          <Route path="/t/sessions/:sessionId/boite" element={<RequireAuth role="trainer"><TrainerToolboxPage /></RequireAuth>} />
           <Route path="/t/programme" element={<RequireAuth role="trainer"><ProgramPage /></RequireAuth>} />
           <Route path="/t/programme/:versionId" element={<RequireAuth role="trainer"><ProgramPage /></RequireAuth>} />
           <Route path="/t/programme/:versionId/ateliers/:templateId" element={<RequireAuth role="trainer"><WorkshopTemplateEditorPage /></RequireAuth>} />

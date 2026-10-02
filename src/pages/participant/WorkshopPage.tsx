@@ -8,6 +8,7 @@ import { FileDrop, FileList } from '../../components/production/FileDrop';
 import { PromptBuilder, CopyButton } from '../../components/production/PromptBuilder';
 import { ProductionForm, ProductionReadOnly, wordCount } from '../../components/production/ProductionForms';
 import { TimeMeasureForm } from '../../components/production/TimeMeasure';
+import { ToolSheet } from '../../components/toolbox/ToolCardItem';
 import { Badge, Button, Card, Checkbox, Field, Input, Loading, Markdown, Modal, Notice, SaveIndicator, Textarea, formatDate, formatTime, useToast } from '../../components/ui';
 import { useAsync } from '../../hooks/useAsync';
 import { useSessionData } from '../../hooks/useSessionData';
@@ -123,6 +124,7 @@ export function WorkshopPage() {
   const [helpReason, setHelpReason] = useState('');
   const [busy, setBusy] = useState(false);
   const [ideaText, setIdeaText] = useState('');
+  const [, setOpenedTool] = useState<string | null>(null);
 
   const myEvaluations = useMemo(() => (data && sub ? data.evaluations.filter((e) => e.submission_id === sub.id).sort((a, b) => b.created_at.localeCompare(a.created_at)) : []), [data, sub]);
   const resources = useAsync(() => backend.listResources(), [backend]);
@@ -285,6 +287,32 @@ export function WorkshopPage() {
               <Markdown text={c.fallback} className="mt-1 text-sm" />
             </details>
           </Card>
+
+          {/* Outil à construire */}
+          {c.tool_blueprint && (
+            <Card title={`Mon outil : « ${c.tool_blueprint.name} »`}>
+              {(() => {
+                const existing = data.toolbox.find((t) => t.session_workshop_id === workshop.id && (teamId ? t.team_id === teamId : t.owner_id === user.id));
+                return (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted">Modèle de départ à adapter à votre structure, puis à tester sur le cas fictif et à enregistrer dans votre boîte à outils. {existing ? `Votre outil existe (version ${existing.version}, ${existing.tests.length} test(s)).` : ''}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {existing ? (
+                        <Link to={`/p/sessions/${session.id}/boite?outil=${existing.id}`} className="rounded-md border border-brand-600 bg-brand-600 text-white px-4 py-2 font-medium hover:bg-brand-700">Ouvrir mon outil dans ma boîte</Link>
+                      ) : (
+                        <Button variant="primary" disabled={!canWork} busy={busy} onClick={async () => { setBusy(true); try { const bp = c.tool_blueprint!; const created = await backend.createToolboxItem({ ...bp, prompt_template: draft?.prompt?.trim() && draft.prompt !== c.prompt_starter ? draft.prompt : bp.prompt_template, session_id: session.id, team_id: teamId, session_workshop_id: workshop.id, source_submission_id: sub?.id ?? null, tool_used: draft?.tool_used ?? '', deploy_plan: '', share_consent: false }); toast('Outil créé dans votre boîte à partir du modèle. Adaptez-le puis testez-le.', 'success'); setOpenedTool(created.id); } catch (e) { toast(e instanceof Error ? e.message : String(e), 'error'); } finally { setBusy(false); } }}>Enregistrer dans ma boîte à outils</Button>
+                      )}
+                      <Link to={`/p/sessions/${session.id}/boite`} className="inline-flex items-center underline text-brand-700">Voir ma boîte à outils</Link>
+                    </div>
+                    <details>
+                      <summary className="cursor-pointer font-medium">Voir le modèle de départ</summary>
+                      <div className="mt-2"><ToolSheet item={c.tool_blueprint} /></div>
+                    </details>
+                  </div>
+                );
+              })()}
+            </Card>
+          )}
 
           {/* Production */}
           <Card title="Ma production">

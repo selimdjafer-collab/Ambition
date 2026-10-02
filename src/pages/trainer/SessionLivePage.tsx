@@ -149,6 +149,13 @@ export function SessionLivePage() {
               </ul>
             )}
           </Card>
+          <Card title={`Boîte à outils du groupe (${data.toolbox.length})`}>
+            <p className="text-sm">En construction {data.toolbox.filter((t) => t.status === 'draft').length} · testés {data.toolbox.filter((t) => t.status === 'tested').length} · prêts {data.toolbox.filter((t) => t.status === 'ready').length} · validés {data.toolbox.filter((t) => t.status === 'validated').length}</p>
+            <ul className="text-sm mt-2 space-y-1 max-h-48 overflow-y-auto">
+              {[...data.toolbox].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 8).map((t) => <li key={t.id} className="flex justify-between gap-2"><span>{t.name} <span className="text-muted">— {profileName(t.owner_id)}</span></span><span className="text-muted">{t.tests.length} test(s)</span></li>)}
+            </ul>
+            <Link to={`/t/sessions/${session.id}/boite`} className="inline-block mt-2 underline text-brand-700 text-sm">Lire, commenter, valider, publier</Link>
+          </Card>
           <IdeasWall data={data} profileName={profileName} />
         </div>
       </div>

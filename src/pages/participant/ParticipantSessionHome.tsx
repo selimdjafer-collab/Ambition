@@ -99,6 +99,7 @@ export function ParticipantSessionHome() {
               ))}
             </ol>
             <div className="mt-4 flex flex-wrap gap-2">
+              <LinkButton to={`/p/sessions/${session.id}/boite`} variant="primary">Ma boîte à outils ({data.toolbox.filter((t) => t.owner_id === user.id || (teamId && t.team_id === teamId)).length})</LinkButton>
               <LinkButton to={`/p/sessions/${session.id}/portfolio`}>Mon portfolio</LinkButton>
               <LinkButton to={`/p/sessions/${session.id}/plan`}>Mon plan d’application à J+7</LinkButton>
             </div>

@@ -300,6 +300,55 @@ select pg_temp.assert((select count(*) from public.shared_examples where id = :'
 select pg_temp.as_user(:'C');
 select pg_temp.assert((select count(*) from public.shared_examples where id = :'ex1') = 0, 'C (hors session) ne voit pas l’exemple');
 
+-- Boîte à outils : fiche, test, validation formateur, partage par copie ---------
+select pg_temp.as_user(:'A');
+insert into public.toolbox_items (session_id, owner_id, team_id, session_workshop_id, name, family, purpose, instructions, prompt_template, verification, data_rules)
+values (:'sid', :'A', :'team1', :'a1', 'Compte rendu de suivi', 'transcription', 'Compte rendu fidèle', 'Ne rien inventer.', '{{transcription}}', '["dates fidèles"]'::jsonb, 'fictif uniquement')
+returning id as tool1 \gset
+select pg_temp.as_user(:'B');
+select pg_temp.assert((select count(*) from public.toolbox_items where id = :'tool1') = 1, 'B (binôme) lit l’outil commun');
+update public.toolbox_items set tests = '[{"at":"2026-10-15T10:00:00Z","input_summary":"R1","result_summary":"ok","ok":true,"minutes":9,"note":""}]'::jsonb, status = 'tested' where id = :'tool1';
+select pg_temp.assert((select status from public.toolbox_items where id = :'tool1') = 'tested', 'test consigné par le binôme');
+select pg_temp.as_user(:'C');
+select pg_temp.assert((select count(*) from public.toolbox_items where id = :'tool1') = 0, 'C ne lit pas l’outil');
+select pg_temp.as_user(:'A');
+do $$ begin
+  update public.toolbox_items set status = 'validated' where owner_id = auth.uid();
+  raise exception 'ÉCHEC : auto-validation d’un outil';
+exception when others then
+  if sqlerrm like 'ÉCHEC%' then raise; end if;
+  raise notice 'ok : un participant ne valide pas son outil';
+end $$;
+do $$ begin
+  update public.toolbox_items set trainer_comment = 'bravo' where owner_id = auth.uid();
+  raise exception 'ÉCHEC : commentaire formateur modifié par un participant';
+exception when others then
+  if sqlerrm like 'ÉCHEC%' then raise; end if;
+  raise notice 'ok : le commentaire formateur est protégé';
+end $$;
+select pg_temp.as_user(:'T');
+do $$ begin
+  perform public.publish_toolbox_item((select id from public.toolbox_items limit 1), 'Outil partagé');
+  raise exception 'ÉCHEC : outil publié sans accord';
+exception when others then
+  if sqlerrm like 'ÉCHEC%' then raise; end if;
+  raise notice 'ok : publication d’outil refusée sans accord de l’auteur';
+end $$;
+update public.toolbox_items set status = 'validated', trainer_comment = 'Outil clair.' where id = :'tool1';
+select pg_temp.assert((select status from public.toolbox_items where id = :'tool1') = 'validated', 'le formateur valide l’outil');
+select pg_temp.as_user(:'A');
+update public.toolbox_items set share_consent = true where id = :'tool1';
+update public.toolbox_items set instructions = 'Ne rien inventer. Écrire « information non disponible ».' where id = :'tool1';
+select pg_temp.assert((select status from public.toolbox_items where id = :'tool1') = 'tested', 'un outil validé modifié repasse en « testé »');
+select pg_temp.as_user(:'T');
+select public.publish_toolbox_item(:'tool1', 'Outil partagé : compte rendu de suivi') as tshared \gset
+select pg_temp.as_user(:'B');
+select pg_temp.assert((select count(*) from public.toolbox_shared where id = :'tshared') = 1, 'B voit l’outil partagé (copie)');
+select pg_temp.as_user(:'C');
+select pg_temp.assert((select count(*) from public.toolbox_shared where id = :'tshared') = 0, 'C (hors session) ne voit pas l’outil partagé');
+select pg_temp.as_user(:'U');
+select pg_temp.assert((select count(*) from public.toolbox_items where id = :'tool1') = 0, 'un autre formateur ne voit pas l’outil');
+
 -- 8) Nouvelle version du programme : session précédente intacte --------------
 select pg_temp.as_user(:'T');
 select public.create_draft_version((select id from public.programs limit 1)) as draft \gset

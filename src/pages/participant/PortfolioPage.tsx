@@ -4,6 +4,8 @@ import { Printer } from 'lucide-react';
 import { useAuth } from '../../auth/AuthProvider';
 import { AppShell, Brand } from '../../components/layout/AppShell';
 import { ProductionReadOnly } from '../../components/production/ProductionForms';
+import { ToolSheet } from '../../components/toolbox/ToolCardItem';
+import { TOOLBOX_STATUS_LABELS } from '../../lib/types';
 import { Button, Loading, Notice, formatDate } from '../../components/ui';
 import { useAsync } from '../../hooks/useAsync';
 import { useSessionData } from '../../hooks/useSessionData';
@@ -95,6 +97,21 @@ export function PortfolioPage() {
             </section>
           );
         })}
+
+        <section className="mt-6 border-t border-line pt-4 print-page">
+          <h3 className="text-lg font-semibold">Ma boîte à outils</h3>
+          {(() => {
+            const team = teamOf(user.id);
+            const tools = data.toolbox.filter((t) => t.owner_id === user.id || (team && t.team_id === team.id));
+            if (!tools.length) return <p className="text-sm text-muted">Aucun outil enregistré.</p>;
+            return tools.map((t) => (
+              <div key={t.id} className="mt-3 border border-line rounded p-3">
+                <h4 className="font-semibold">{t.name} <span className="text-muted font-normal text-sm">· version {t.version} · {TOOLBOX_STATUS_LABELS[t.status]} · {t.tests.length} test(s)</span></h4>
+                <ToolSheet item={t} />
+              </div>
+            ));
+          })()}
+        </section>
 
         <section className="mt-6 border-t border-line pt-4">
           <h3 className="text-lg font-semibold">Plan d’application à J+7</h3>

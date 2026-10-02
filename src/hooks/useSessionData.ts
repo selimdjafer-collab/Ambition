@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '../auth/AuthProvider';
 import type { RealtimeTable } from '../lib/backend/types';
-import type { Enrollment, Evaluation, HelpRequest, Idea, Poll, PollAnswer, Profile, Session, SessionWorkshop, SharedExample, Submission, Team, TeamMember } from '../lib/types';
+import type { Enrollment, Evaluation, HelpRequest, Idea, Poll, PollAnswer, Profile, Session, SessionWorkshop, SharedExample, Submission, Team, TeamMember, ToolboxItem, ToolboxShared } from '../lib/types';
 
 export interface SessionData {
   session: Session;
@@ -17,6 +17,8 @@ export interface SessionData {
   pollAnswers: PollAnswer[];
   ideas: Idea[];
   sharedExamples: SharedExample[];
+  toolbox: ToolboxItem[];
+  toolboxShared: ToolboxShared[];
 }
 
 /**
@@ -41,7 +43,7 @@ export function useSessionData(sessionId: string | undefined) {
         setError('Session introuvable ou accès refusé.');
         return;
       }
-      const [workshops, enrollments, teamsRes, profiles, submissions, helpRequests, polls, pollAnswers, ideas, sharedExamples] = await Promise.all([
+      const [workshops, enrollments, teamsRes, profiles, submissions, helpRequests, polls, pollAnswers, ideas, sharedExamples, toolbox, toolboxShared] = await Promise.all([
         backend.listSessionWorkshops(sessionId),
         backend.listEnrollments(sessionId),
         backend.listTeams(sessionId),
@@ -52,9 +54,11 @@ export function useSessionData(sessionId: string | undefined) {
         backend.listPollAnswers(sessionId),
         backend.listIdeas(sessionId),
         backend.listSharedExamples(sessionId),
+        backend.listToolboxItems(sessionId),
+        backend.listToolboxShared(sessionId),
       ]);
       const evaluations = await backend.listEvaluations(submissions.map((s) => s.id));
-      setData({ session, workshops, enrollments, teams: teamsRes.teams, members: teamsRes.members, profiles, submissions, helpRequests, evaluations, polls, pollAnswers, ideas, sharedExamples });
+      setData({ session, workshops, enrollments, teams: teamsRes.teams, members: teamsRes.members, profiles, submissions, helpRequests, evaluations, polls, pollAnswers, ideas, sharedExamples, toolbox, toolboxShared });
       setError(null);
       setLastSync(Date.now());
       setConnected(true);
@@ -112,6 +116,12 @@ export function useSessionData(sessionId: string | undefined) {
             break;
           case 'shared_examples':
             patch.sharedExamples = await backend.listSharedExamples(sessionId);
+            break;
+          case 'toolbox_items':
+            patch.toolbox = await backend.listToolboxItems(sessionId);
+            break;
+          case 'toolbox_shared':
+            patch.toolboxShared = await backend.listToolboxShared(sessionId);
             break;
         }
         setData((d) => (d ? { ...d, ...patch } : d));

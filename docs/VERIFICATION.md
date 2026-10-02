@@ -32,6 +32,7 @@ chaque étape ce qui est permis et refusé.
 | 10 | Portfolio lisible sans notes privées d'autrui | Navigateur : la note privée saisie par le formateur n'apparaît pas |
 | 11 | 11 séquences = 420 min hors pauses | Test unitaire, seed, SQL (`sum(duration_min)`), publication refusée si répartition incohérente |
 | 12 | Dates fictives distinctes des dates de session | Test unitaire (septembre 2026) et SQL (session au 15/10/2026) |
+| + | Boîte à outils : binôme lit l'outil commun, tiers non ; pas d'auto-validation ni de modification du commentaire formateur ; publication refusée sans accord ; un outil validé modifié repasse en « testé » ; copie partagée visible des membres seulement | SQL ; navigateur : création depuis le modèle d'atelier, banc d'essai, partage, validation et publication par le formateur, visibilité pour une autre participante |
 
 ## Scénario manuel à deux participants authentifiés (Supabase réel)
 

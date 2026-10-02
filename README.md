@@ -1,11 +1,14 @@
 # Atelier IA — START EVOLUTION
 
-Application web permettant à un formateur d'animer la formation pratique
-**« Créer sa boîte à outils IA pour agir au quotidien en ETT / ETTI / EATT »**
-(7 h en deux séances de 3 h 30, hors pauses) pour 6 à 10 permanents d'agence :
-préparer une session, accueillir les participants, lancer les ateliers, suivre
-le groupe en direct, aider les personnes bloquées, récupérer les productions,
-les commenter et vérifier les acquis individuels.
+Application web permettant à un formateur d'animer le **module 2** de la
+formation pratique **« Créer sa boîte à outils IA pour agir au quotidien en
+ETT / ETTI / EATT »** (7 h en deux séances de 3 h 30, hors pauses) pour 6 à
+10 permanents d'agence d'intérim d'insertion. Les bases du prompt et de l'IA
+sont acquises au module 1 : ici, chaque participant construit, teste et
+déploie de vrais outils réutilisables pour son activité. Le formateur prépare
+la session, suit le groupe en direct, aide les personnes bloquées, lit les
+productions et les outils, les commente, les valide et récupère la boîte à
+outils du groupe.
 
 Référence éditoriale du contenu : septembre 2026. Vérifications documentaires
 des fiches outils : 1er octobre 2026. Les dates de session sont des paramètres
@@ -13,6 +16,13 @@ distincts.
 
 ## Ce que contient la V1
 
+- **Boîte à outils** : chaque atelier fournit un modèle d'outil de départ
+  (instructions permanentes, message type avec emplacements, format de
+  sortie, vérifications humaines, règles de données, secours) que le
+  participant adapte, enregistre dans sa boîte, teste sur le cas fictif avec
+  un banc d'essai (message prêt à coller, verdict, temps), versionne, marque
+  « prêt à proposer » et exporte en markdown. Le formateur commente, valide
+  et publie au groupe des copies autorisées par leurs auteurs.
 - **Parcours de 420 minutes** en 11 séquences préchargées (accueil, défi
   données, six ateliers, réactivation, défi individuel, bilan), avec durées,
   répartitions, objectifs observables, briefs, étapes, livrables, grilles de

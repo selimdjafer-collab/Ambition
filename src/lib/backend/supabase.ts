@@ -31,11 +31,14 @@ import type {
   TimerState,
   ToolCard,
   ToolCardHistory,
+  ToolboxItem,
+  ToolboxShared,
+  ToolboxTest,
   WorkshopPrivate,
   WorkshopPrivateContent,
   WorkshopTemplate,
 } from '../types';
-import type { AuthUser, Backend, RealtimeTable } from './types';
+import type { AuthUser, Backend, RealtimeTable, ToolboxItemInput, ToolboxItemPatch } from './types';
 
 function must<T>(res: { data: T | null; error: { message: string } | null }): T {
   if (res.error) throw new Error(res.error.message);
@@ -60,6 +63,8 @@ const REALTIME_TABLES: RealtimeTable[] = [
   'poll_answers',
   'ideas',
   'shared_examples',
+  'toolbox_items',
+  'toolbox_shared',
 ];
 
 const SESSION_FILTERED: RealtimeTable[] = [
@@ -71,6 +76,8 @@ const SESSION_FILTERED: RealtimeTable[] = [
   'polls',
   'ideas',
   'shared_examples',
+  'toolbox_items',
+  'toolbox_shared',
 ];
 
 export class SupabaseBackend implements Backend {
@@ -681,6 +688,50 @@ export class SupabaseBackend implements Backend {
 
   async deleteIdea(id: string): Promise<void> {
     ok(await this.sb.from('ideas').delete().eq('id', id));
+  }
+
+  // --- Boîte à outils --------------------------------------------------------
+  async listToolboxItems(sessionId: string): Promise<ToolboxItem[]> {
+    return must(await this.sb.from('toolbox_items').select('*').eq('session_id', sessionId).order('updated_at', { ascending: false })) as ToolboxItem[];
+  }
+
+  async createToolboxItem(input: ToolboxItemInput): Promise<ToolboxItem> {
+    const user = await this.getAuthUser();
+    if (!user) throw new Error('Connexion requise');
+    return must(await this.sb.from('toolbox_items').insert({ ...input, owner_id: user.id }).select('*').single()) as ToolboxItem;
+  }
+
+  async updateToolboxItem(id: string, patch: ToolboxItemPatch, newVersion = false): Promise<ToolboxItem> {
+    const extra: Record<string, unknown> = {};
+    if (newVersion) {
+      const current = must(await this.sb.from('toolbox_items').select('*').eq('id', id).single()) as ToolboxItem;
+      const snapshot = { name: current.name, family: current.family, purpose: current.purpose, inputs: current.inputs, instructions: current.instructions, prompt_template: current.prompt_template, output_format: current.output_format, verification: current.verification, data_rules: current.data_rules, fallback: current.fallback };
+      extra.history = [...current.history, { version: current.version, saved_at: current.updated_at, snapshot }];
+      extra.version = current.version + 1;
+    }
+    return must(await this.sb.from('toolbox_items').update({ ...patch, ...extra }).eq('id', id).select('*').single()) as ToolboxItem;
+  }
+
+  async addToolboxTest(id: string, test: ToolboxTest): Promise<ToolboxItem> {
+    const current = must(await this.sb.from('toolbox_items').select('tests,status').eq('id', id).single()) as { tests: ToolboxTest[]; status: ToolboxItem['status'] };
+    const status = current.status === 'draft' ? 'tested' : current.status;
+    return must(await this.sb.from('toolbox_items').update({ tests: [...current.tests, test], status }).eq('id', id).select('*').single()) as ToolboxItem;
+  }
+
+  async deleteToolboxItem(id: string): Promise<void> {
+    ok(await this.sb.from('toolbox_items').delete().eq('id', id));
+  }
+
+  async listToolboxShared(sessionId: string): Promise<ToolboxShared[]> {
+    return must(await this.sb.from('toolbox_shared').select('*').eq('session_id', sessionId).order('published_at', { ascending: false })) as ToolboxShared[];
+  }
+
+  async publishToolboxItem(id: string, title: string): Promise<void> {
+    ok(await this.sb.rpc('publish_toolbox_item', { p_item_id: id, p_title: title }));
+  }
+
+  async deleteToolboxShared(id: string): Promise<void> {
+    ok(await this.sb.from('toolbox_shared').delete().eq('id', id));
   }
 
   // --- Plans d'application --------------------------------------------------

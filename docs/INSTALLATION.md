@@ -23,6 +23,7 @@ pnpm install
    - `supabase/migrations/0002_functions.sql`
    - `supabase/migrations/0003_policies.sql`
    - `supabase/migrations/0004_storage_realtime.sql`
+   - `supabase/migrations/0005_toolbox.sql` (boîte à outils des participants)
 3. Appliquer le seed pédagogique `supabase/seed.sql` (idempotent : il peut être
    rejoué ; les fiches outils déjà modifiées par un formateur ne sont pas
    écrasées).

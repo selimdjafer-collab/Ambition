@@ -37,7 +37,8 @@ export function ReportPage() {
       const ev = sub ? data.evaluations.filter((x) => x.submission_id === sub.id).sort((a, b) => b.created_at.localeCompare(a.created_at))[0] : undefined;
       return { w, sub, st, ev };
     });
-    return { e, team, cells, plan: plans.data?.find((p) => p.user_id === uid) };
+    const toolsOf = data.toolbox.filter((t) => t.owner_id === uid || (team && t.team_id === team.id));
+    return { e, team, cells, plan: plans.data?.find((p) => p.user_id === uid), tools: toolsOf };
   });
   const totals = {
     submitted: data.submissions.filter((s) => s.current_version > 0).length,
@@ -46,8 +47,8 @@ export function ReportPage() {
     help: data.helpRequests.length,
   };
   const exportCsv = () => {
-    const headers = ['Participant', 'Binôme', ...workshops.flatMap((w) => [`${w.code} statut`, `${w.code} version`, `${w.code} note`, `${w.code} décision`]), 'Plan J+7 : tâche', 'Plan J+7 : outil'];
-    const body = rows.map((r) => [r.e.display_name, r.team?.name ?? '', ...r.cells.flatMap((c) => [PARTICIPANT_STATUS_LABELS[c.st], c.sub?.current_version ?? 0, c.ev ? `${c.ev.total}/10` : '', c.ev?.decision ?? '']), r.plan?.plan.task ?? '', r.plan?.plan.tool ?? '']);
+    const headers = ['Participant', 'Binôme', ...workshops.flatMap((w) => [`${w.code} statut`, `${w.code} version`, `${w.code} note`, `${w.code} décision`]), 'Outils construits', 'Outils testés', 'Outils validés', 'Plan J+7 : tâche', 'Plan J+7 : outil'];
+    const body = rows.map((r) => [r.e.display_name, r.team?.name ?? '', ...r.cells.flatMap((c) => [PARTICIPANT_STATUS_LABELS[c.st], c.sub?.current_version ?? 0, c.ev ? `${c.ev.total}/10` : '', c.ev?.decision ?? '']), r.tools.length, r.tools.filter((t) => t.tests.length > 0).length, r.tools.filter((t) => t.status === 'validated').length, r.plan?.plan.task ?? '', r.plan?.plan.tool ?? '']);
     downloadText(`rapport-${session.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.csv`, toCsv(headers, body), 'text/csv;charset=utf-8');
   };
   return (
@@ -70,13 +71,14 @@ export function ReportPage() {
         <Card title="Participations enregistrées et acquis observés">
           <div className="overflow-x-auto">
             <table className="text-xs w-full">
-              <thead><tr className="text-left border-b border-line"><th className="py-1 pr-2">Participant</th><th className="pr-2">Binôme</th>{workshops.map((w) => <th key={w.id} className="pr-2" title={w.title}>{w.code}</th>)}<th>Plan J+7</th></tr></thead>
+              <thead><tr className="text-left border-b border-line"><th className="py-1 pr-2">Participant</th><th className="pr-2">Binôme</th>{workshops.map((w) => <th key={w.id} className="pr-2" title={w.title}>{w.code}</th>)}<th className="pr-2">Outils</th><th>Plan J+7</th></tr></thead>
               <tbody>
                 {rows.map((r) => (
                   <tr key={r.e.id} className="border-b border-line align-top">
                     <td className="py-1 pr-2 font-medium">{r.e.display_name}</td>
                     <td className="pr-2 text-muted">{r.team?.name ?? '—'}</td>
                     {r.cells.map((c) => <td key={c.w.id} className="pr-2">{PARTICIPANT_STATUS_LABELS[c.st]}{c.sub?.current_version ? ` V${c.sub.current_version}` : ''}{c.ev ? ` · ${c.ev.total}/10` : ''}</td>)}
+                    <td className="pr-2">{r.tools.length} ({r.tools.filter((t) => t.tests.length > 0).length} testés, {r.tools.filter((t) => t.status === 'validated').length} validés)</td>
                     <td>{r.plan ? `${r.plan.plan.task || '—'} (${r.plan.plan.tool || 'outil ?'})` : '—'}</td>
                   </tr>
                 ))}

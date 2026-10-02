@@ -30,6 +30,17 @@
   + RLS). Les remises, évaluations, publications et versions passent par des
   fonctions serveur `security definer` qui vérifient les droits.
 
+## Boîte à outils
+
+Les outils construits (`toolbox_items`) suivent les mêmes règles que les
+productions : lecture par l'auteur, son binôme et le formateur de la session ;
+un participant ne peut ni se valider ni modifier le commentaire du formateur
+(trigger de garde) ; toute modification d'un outil validé le repasse en
+« testé ». Le partage au groupe est une copie (`toolbox_shared`) créée par le
+formateur avec l'accord explicite de l'auteur, sans ses tests ni commentaires.
+Une validation est un avis de formation sur le cas fictif, jamais une
+autorisation d'usage sur des données réelles.
+
 ## Stockage
 
 - Bucket privé `submissions`, chemin `{session}/{production}/{fichier}` ;

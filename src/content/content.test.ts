@@ -30,6 +30,18 @@ describe('contenus pédagogiques', () => {
     for (const term of ['entreprise utilisatrice', 'prescripteur', 'PASS IAE', 'parcours d’insertion']) expect(all.toLowerCase(), term).toContain(term.toLowerCase());
   });
 
+  it('chaque atelier fournit un modèle d’outil réutilisable (module 2)', () => {
+    for (const code of ['DEF', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'DI']) {
+      const bp = WORKSHOPS.find((w) => w.code === code)?.content.tool_blueprint;
+      expect(bp, code).toBeDefined();
+      expect(bp!.name.length, code).toBeGreaterThan(3);
+      expect(bp!.instructions.length, code).toBeGreaterThan(80);
+      expect(bp!.prompt_template.length, code).toBeGreaterThan(20);
+      expect(bp!.verification.length, code).toBeGreaterThanOrEqual(3);
+      expect(bp!.data_rules.length, code).toBeGreaterThan(20);
+    }
+  });
+
   it('le défi données a 8 cartes et le défi individuel des variantes', () => {
     expect(WORKSHOPS.find((w) => w.code === 'DEF')?.content.data_cards).toHaveLength(8);
     expect((WORKSHOPS.find((w) => w.code === 'DI')?.content.variants ?? []).length).toBeGreaterThanOrEqual(3);

@@ -49,12 +49,15 @@ import type {
   TimerState,
   ToolCard,
   ToolCardHistory,
+  ToolboxItem,
+  ToolboxShared,
+  ToolboxTest,
   WorkshopPrivate,
   WorkshopPrivateContent,
   WorkshopTemplate,
 } from '../types';
 import { emptySubmissionContent } from '../types';
-import type { AuthUser, Backend, RealtimeTable } from './types';
+import type { AuthUser, Backend, RealtimeTable, ToolboxItemInput, ToolboxItemPatch } from './types';
 
 const STORAGE_KEY = 'atelier-ia-demo-v1';
 const USER_KEY = 'atelier-ia-demo-user';
@@ -95,6 +98,8 @@ interface DB {
   ideas: Idea[];
   action_plans: ActionPlan[];
   shared_examples: SharedExample[];
+  toolbox_items: ToolboxItem[];
+  toolbox_shared: ToolboxShared[];
   session_events: SessionEvent[];
   files: Record<string, { name: string; mime: string; dataUrl: string }>;
 }
@@ -370,6 +375,57 @@ function buildDemoDb(): DB {
     { id: newId(), session_id: sessionId, actor_id: trainerId, type: 'timer.start', payload: { seconds: 37 * 60 }, created_at: iso(-12) },
   ];
 
+  const toolbox_items: ToolboxItem[] = [
+    {
+      id: newId(), session_id: sessionId, owner_id: participantIds[0], team_id: teams[0].id, session_workshop_id: a1.id, source_submission_id: a1Team1.id,
+      name: 'Compte rendu de suivi → plan d’action', family: 'transcription',
+      purpose: 'Transformer les notes ou la transcription d’un entretien de suivi en mission en compte rendu fidèle avec tableau d’actions, sans rien inventer.',
+      inputs: 'Transcription ou notes relues, sans nom ni coordonnées ; date de l’entretien ; fiche mission à jour.',
+      instructions: `Tu aides une conseillère en insertion d’une ETTI à rédiger un compte rendu de suivi.\nRègles : utilise uniquement le texte fourni ; distingue faits explicites, éléments inconnus et actions convenues ; n’invente ni disponibilité, ni salaire, ni confirmation d’entreprise utilisatrice ; écris « information non disponible » quand le texte ne dit rien ; aucune appréciation de personnalité ; aucune mention de santé ; 300 mots maximum.`,
+      prompt_template: `Voici la transcription d’un entretien de suivi du {{date}} :\n{{transcription}}\n\nRédige le compte rendu (faits / à confirmer / actions) puis le tableau action | responsable | échéance. Signale toute ambiguïté.`,
+      output_format: 'Compte rendu en trois rubriques puis tableau à trois colonnes.',
+      verification: ['Chaque date correspond à la transcription', 'La mission n’est pas présentée comme confirmée', 'Aucun montant de salaire', 'Trois actions attribuées et datées', 'Aucune donnée de santé ni appréciation'],
+      data_rules: 'Uniquement des transcriptions relues et pseudonymisées, selon la politique de l’agence ; jamais de PASS IAE, de coordonnées ni de santé.',
+      fallback: 'Trame de compte rendu à remplir à la main (R4, étape 6).',
+      tool_used: 'Assistant autorisé (démo)', status: 'validated', version: 2,
+      history: [{ version: 1, saved_at: iso(-50), snapshot: { name: 'Compte rendu de suivi', family: 'transcription', purpose: 'Première version', inputs: 'Transcription', instructions: 'Résume l’entretien.', prompt_template: '{{transcription}}', output_format: 'Texte', verification: ['Relire'], data_rules: '', fallback: '' } }],
+      tests: [{ at: iso(-45), input_summary: 'R1 (transcription fictive)', result_summary: 'Mission annoncée « confirmée » en V1', ok: false, minutes: 12, note: 'Ajout de l’interdit « ne jamais confirmer »' }, { at: iso(-30), input_summary: 'R1', result_summary: 'Compte rendu fidèle, 3 actions datées', ok: true, minutes: 9, note: '' }],
+      share_consent: true, trainer_comment: 'Outil clair ; à proposer à l’équipe avec la règle de pseudonymisation.', deploy_plan: 'Après chaque entretien de suivi, le lundi et le jeudi ; relecture systématique avant saisie dans la fiche salarié.',
+      created_at: iso(-55), updated_at: iso(-28), updated_by: participantIds[0],
+    },
+    {
+      id: newId(), session_id: sessionId, owner_id: participantIds[2], team_id: teams[1].id, session_workshop_id: a2.id, source_submission_id: null,
+      name: 'Mes documents de mission répondent', family: 'documents',
+      purpose: 'Répondre aux questions récurrentes sur une mission à partir des fiches et procédures, avec le passage exact.',
+      inputs: 'Fiche mission à jour (V2), procédure d’accueil, guide de visite ; la question posée.',
+      instructions: `Réponds uniquement à partir des documents fournis. Pour chaque réponse : document, version, rubrique, passage copié. Si l’information manque : « information non disponible ». Si deux versions se contredisent, signale le conflit et privilégie la version datée la plus récente.`,
+      prompt_template: `Documents joints : {{documents}}\nQuestion : {{question}}`,
+      output_format: 'Réponse courte + tableau source / passage / à vérifier par un humain.',
+      verification: ['Le passage cité existe réellement', 'La version la plus récente est utilisée', 'Les manques sont dits « non disponibles »'],
+      data_rules: 'Documents de mission sans donnée personnelle ; jamais de dossier de salarié.',
+      fallback: 'FAQ texte tenue à jour dans le dossier de la mission.',
+      tool_used: 'Gemini Notebook (démo)', status: 'tested', version: 1, history: [],
+      tests: [{ at: iso(-5), input_summary: 'R2 à R5, question « horaires actuels »', result_summary: '9 h–17 h cité depuis R2 V2', ok: true, minutes: 6, note: 'R3 bien identifiée comme ancienne version' }],
+      share_consent: false, trainer_comment: '', deploy_plan: '', created_at: iso(-10), updated_at: iso(-5), updated_by: participantIds[2],
+    },
+    {
+      id: newId(), session_id: sessionId, owner_id: participantIds[4], team_id: null, session_workshop_id: null, source_submission_id: null,
+      name: 'Courriel de préparation de mission', family: 'assistants',
+      purpose: 'Rédiger en 120 mots un courriel interne de préparation de mission qui liste ce qui reste à confirmer.',
+      inputs: 'Fiche mission ; destinataire interne.',
+      instructions: 'Ton professionnel, phrases courtes, aucune donnée personnelle, aucune confirmation inventée, 120 mots maximum.',
+      prompt_template: 'Fiche mission : {{fiche_mission}}\nRédige le courriel interne de préparation.',
+      output_format: 'Courriel : objet, 3 paragraphes, liste des points à confirmer.',
+      verification: ['120 mots maximum', 'Points à confirmer listés', 'Aucune confirmation inventée'],
+      data_rules: 'Fiche mission uniquement.', fallback: 'Modèle de courriel dans le dossier partagé.',
+      tool_used: '', status: 'draft', version: 1, history: [], tests: [], share_consent: false, trainer_comment: '', deploy_plan: '',
+      created_at: iso(-3), updated_at: iso(-3), updated_by: participantIds[4],
+    },
+  ];
+  const toolbox_shared: ToolboxShared[] = [
+    { id: newId(), session_id: sessionId, title: 'Outil partagé : compte rendu de suivi (binôme 1, v2)', item: { ...(({ name, family, purpose, inputs, instructions, prompt_template, output_format, verification, data_rules, fallback, tool_used, version }) => ({ name, family, purpose, inputs, instructions, prompt_template, output_format, verification, data_rules, fallback, tool_used, version }))(toolbox_items[0]) }, source_item_id: toolbox_items[0].id, published_by: trainerId, published_at: iso(-20) },
+  ];
+
   const settings: AppSettings = {
     id: 1,
     org_name: 'START EVOLUTION',
@@ -384,7 +440,7 @@ function buildDemoDb(): DB {
     users, profiles, settings, programs, program_versions, workshop_templates, workshop_private, resources, tool_cards,
     tool_card_history: [], quiz_questions, sessions, session_workshops, session_workshop_private, enrollments, teams,
     team_members, submissions, submission_versions, help_requests, evaluations, evaluation_notes, peer_reviews, polls,
-    poll_keys, poll_answers, ideas, action_plans, shared_examples, session_events, files: {},
+    poll_keys, poll_answers, ideas, action_plans, shared_examples, toolbox_items, toolbox_shared, session_events, files: {},
   };
 }
 
@@ -422,7 +478,10 @@ export class DemoBackend implements Backend {
   private load(): DB {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw) as DB;
+      if (raw) {
+        const db = JSON.parse(raw) as DB;
+        if (Array.isArray(db.toolbox_items) && Array.isArray(db.toolbox_shared)) return db;
+      }
     } catch {
       /* ignore */
     }
@@ -445,7 +504,7 @@ export class DemoBackend implements Backend {
   }
 
   private emitAll(): void {
-    const all: RealtimeTable[] = ['sessions', 'session_workshops', 'enrollments', 'teams', 'team_members', 'submissions', 'help_requests', 'evaluations', 'polls', 'poll_answers', 'ideas', 'shared_examples'];
+    const all: RealtimeTable[] = ['sessions', 'session_workshops', 'enrollments', 'teams', 'team_members', 'submissions', 'help_requests', 'evaluations', 'polls', 'poll_answers', 'ideas', 'shared_examples', 'toolbox_items', 'toolbox_shared'];
     all.forEach((t) => this.listeners.forEach((l) => l(t)));
   }
 
@@ -805,6 +864,8 @@ export class DemoBackend implements Backend {
     this.db.shared_examples = this.db.shared_examples.filter((x) => !exIds.has(x.id));
     this.db.peer_reviews = this.db.peer_reviews.filter((r) => !exIds.has(r.shared_example_id));
     this.db.session_events = this.db.session_events.filter((e) => e.session_id !== id);
+    this.db.toolbox_items = this.db.toolbox_items.filter((t) => t.session_id !== id);
+    this.db.toolbox_shared = this.db.toolbox_shared.filter((t) => t.session_id !== id);
     for (const k of Object.keys(this.db.files)) if (k.startsWith(`${id}/`)) delete this.db.files[k];
     this.emit('sessions');
   }
@@ -1283,6 +1344,87 @@ export class DemoBackend implements Backend {
     if (i.author_id !== this.currentUserId && !this.isSessionTrainer(i.session_id)) throw new Error('Non autorisé');
     this.db.ideas = this.db.ideas.filter((x) => x.id !== id);
     this.emit('ideas');
+  }
+
+  // --- Boîte à outils --------------------------------------------------------
+  private canReadTool(t: ToolboxItem): boolean {
+    return t.owner_id === this.currentUserId || this.isTeammate(t.team_id) || this.isSessionTrainer(t.session_id);
+  }
+
+  async listToolboxItems(sessionId: string): Promise<ToolboxItem[]> {
+    this.assertAccess(sessionId);
+    return this.db.toolbox_items.filter((t) => t.session_id === sessionId && this.canReadTool(t)).sort((a, b) => b.updated_at.localeCompare(a.updated_at));
+  }
+
+  async createToolboxItem(input: ToolboxItemInput): Promise<ToolboxItem> {
+    const me = this.uid();
+    if (!this.isMember(input.session_id)) throw new Error('Vous n’êtes pas inscrit à cette session');
+    if (input.team_id && !this.isTeammate(input.team_id)) throw new Error('Vous ne faites pas partie de ce binôme');
+    const item: ToolboxItem = { ...input, id: newId(), owner_id: me, status: 'draft', version: 1, history: [], tests: [], trainer_comment: '', created_at: nowIso(), updated_at: nowIso(), updated_by: me };
+    this.db.toolbox_items.push(item);
+    this.log(input.session_id, 'toolbox_items.created', { id: item.id, status: 'draft' });
+    this.emit('toolbox_items');
+    return item;
+  }
+
+  async updateToolboxItem(id: string, patch: ToolboxItemPatch, newVersion = false): Promise<ToolboxItem> {
+    const t = this.db.toolbox_items.find((x) => x.id === id);
+    if (!t) throw new Error('Outil introuvable');
+    const trainer = this.isSessionTrainer(t.session_id);
+    if (!(t.owner_id === this.currentUserId || this.isTeammate(t.team_id) || trainer)) throw new Error('Non autorisé');
+    if (!trainer && ((patch.trainer_comment !== undefined && patch.trainer_comment !== t.trainer_comment) || (patch.status === 'validated' && t.status !== 'validated'))) throw new Error('Modification refusée : la validation et le commentaire relèvent du formateur');
+    if (newVersion) {
+      t.history = [...t.history, { version: t.version, saved_at: t.updated_at, snapshot: { name: t.name, family: t.family, purpose: t.purpose, inputs: t.inputs, instructions: t.instructions, prompt_template: t.prompt_template, output_format: t.output_format, verification: t.verification, data_rules: t.data_rules, fallback: t.fallback } }];
+      t.version += 1;
+    }
+    const before = t.status;
+    Object.assign(t, patch, { updated_at: nowIso(), updated_by: this.uid() });
+    if (!trainer && before === 'validated' && (patch.instructions !== undefined || patch.prompt_template !== undefined || patch.verification !== undefined || patch.data_rules !== undefined)) t.status = 'tested';
+    if (t.status !== before) this.log(t.session_id, 'toolbox_items.status', { id, from: before, to: t.status });
+    this.emit('toolbox_items');
+    return t;
+  }
+
+  async addToolboxTest(id: string, test: ToolboxTest): Promise<ToolboxItem> {
+    const t = this.db.toolbox_items.find((x) => x.id === id);
+    if (!t || !(t.owner_id === this.currentUserId || this.isTeammate(t.team_id))) throw new Error('Non autorisé');
+    t.tests = [...t.tests, test];
+    if (t.status === 'draft') t.status = 'tested';
+    t.updated_at = nowIso();
+    this.emit('toolbox_items');
+    return t;
+  }
+
+  async deleteToolboxItem(id: string): Promise<void> {
+    const t = this.db.toolbox_items.find((x) => x.id === id);
+    if (!t) return;
+    if (!(t.owner_id === this.currentUserId || this.isSessionTrainer(t.session_id))) throw new Error('Non autorisé');
+    this.db.toolbox_items = this.db.toolbox_items.filter((x) => x.id !== id);
+    this.emit('toolbox_items');
+  }
+
+  async listToolboxShared(sessionId: string): Promise<ToolboxShared[]> {
+    this.assertAccess(sessionId);
+    return this.db.toolbox_shared.filter((x) => x.session_id === sessionId).sort((a, b) => b.published_at.localeCompare(a.published_at));
+  }
+
+  async publishToolboxItem(id: string, title: string): Promise<void> {
+    const t = this.db.toolbox_items.find((x) => x.id === id);
+    if (!t) throw new Error('Outil introuvable');
+    this.assertSessionTrainer(t.session_id);
+    if (!t.share_consent) throw new Error('L’auteur n’a pas autorisé le partage de cet outil');
+    const { name, family, purpose, inputs, instructions, prompt_template, output_format, verification, data_rules, fallback, tool_used, version } = t;
+    this.db.toolbox_shared.push({ id: newId(), session_id: t.session_id, title, item: structuredClone({ name, family, purpose, inputs, instructions, prompt_template, output_format, verification, data_rules, fallback, tool_used, version }), source_item_id: id, published_by: this.uid(), published_at: nowIso() });
+    this.log(t.session_id, 'toolbox.published', { item_id: id });
+    this.emit('toolbox_shared');
+  }
+
+  async deleteToolboxShared(id: string): Promise<void> {
+    const x = this.db.toolbox_shared.find((e) => e.id === id);
+    if (!x) return;
+    this.assertSessionTrainer(x.session_id);
+    this.db.toolbox_shared = this.db.toolbox_shared.filter((e) => e.id !== id);
+    this.emit('toolbox_shared');
   }
 
   // --- Plans d'application --------------------------------------------------

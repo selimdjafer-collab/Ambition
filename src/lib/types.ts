@@ -88,6 +88,85 @@ export interface JobContext {
   why_etti: string;
 }
 
+/**
+ * Modèle d'outil de départ : ce que l'atelier fait construire. Le participant
+ * l'adapte, le teste sur le cas fictif et l'enregistre dans sa boîte à outils.
+ */
+export interface ToolBlueprint {
+  name: string;
+  family: Family;
+  purpose: string;
+  /** Ce qu'il faut fournir à l'outil à chaque usage (entrées). */
+  inputs: string;
+  /** Instructions permanentes (rôle, règles, interdits) à placer dans le projet / les instructions personnalisées. */
+  instructions: string;
+  /** Message type à envoyer à chaque usage, avec des emplacements {{comme_ceci}}. */
+  prompt_template: string;
+  output_format: string;
+  /** Points de vérification humaine avant réutilisation. */
+  verification: string[];
+  /** Données autorisées et interdites dans cet outil. */
+  data_rules: string;
+  /** Solution de secours si l'outil n'est pas disponible. */
+  fallback: string;
+}
+
+export type ToolboxStatus = 'draft' | 'tested' | 'ready' | 'validated';
+
+export const TOOLBOX_STATUS_LABELS: Record<ToolboxStatus, string> = {
+  draft: 'En construction',
+  tested: 'Testé sur le cas fictif',
+  ready: 'Prêt à proposer',
+  validated: 'Validé par le formateur',
+};
+
+export interface ToolboxTest {
+  at: string;
+  input_summary: string;
+  result_summary: string;
+  ok: boolean;
+  minutes: number | null;
+  note: string;
+}
+
+export interface ToolboxHistoryEntry {
+  version: number;
+  saved_at: string;
+  snapshot: ToolBlueprint;
+}
+
+/** Outil construit par un participant (ou un binôme) : fiche, versions, tests. */
+export interface ToolboxItem extends ToolBlueprint {
+  id: string;
+  session_id: string;
+  owner_id: string;
+  team_id: string | null;
+  session_workshop_id: string | null;
+  source_submission_id: string | null;
+  tool_used: string;
+  status: ToolboxStatus;
+  version: number;
+  history: ToolboxHistoryEntry[];
+  tests: ToolboxTest[];
+  share_consent: boolean;
+  trainer_comment: string;
+  deploy_plan: string;
+  created_at: string;
+  updated_at: string;
+  updated_by: string | null;
+}
+
+/** Copie publiée au groupe par le formateur, avec l'accord de l'auteur. */
+export interface ToolboxShared {
+  id: string;
+  session_id: string;
+  title: string;
+  item: ToolBlueprint & { tool_used: string; version: number };
+  source_item_id: string | null;
+  published_by: string;
+  published_at: string;
+}
+
 /** Contenu publié d'un atelier (visible des participants quand l'atelier est ouvert). */
 export interface WorkshopContent {
   objective: string;
@@ -124,6 +203,8 @@ export interface WorkshopContent {
   job_context?: JobContext;
   /** Proposer la mesure du temps habituel / observé (vérification incluse). */
   time_tracking?: boolean;
+  /** Modèle d'outil de départ à adapter, tester et enregistrer dans la boîte à outils. */
+  tool_blueprint?: ToolBlueprint;
 }
 
 /** Contenu publié dans une session : les aides sont servies séparément, selon le niveau révélé. */
