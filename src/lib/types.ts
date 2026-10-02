@@ -26,9 +26,9 @@ export type Family =
   | 'assistants';
 
 export const FAMILIES: { key: Family; label: string; verb: string }[] = [
-  { key: 'transcription', label: 'Transcription', verb: 'Transformer un entretien de suivi en compte rendu fidèle et plan d’action' },
-  { key: 'documents', label: 'Documents', verb: 'Faire répondre les documents de la mission, passages à l’appui' },
-  { key: 'recherche', label: 'Recherche', verb: 'Préparer une visite d’entreprise utilisatrice avec des sources vérifiées' },
+  { key: 'transcription', label: 'Transcription', verb: 'Transformer un entretien de suivi de mission en compte rendu fidèle et plan d’action' },
+  { key: 'documents', label: 'Documents', verb: 'Faire répondre les documents d’une commande et d’une mission, passages à l’appui' },
+  { key: 'recherche', label: 'Recherche', verb: 'Préparer une visite ou un rendez-vous avec une entreprise utilisatrice, sources vérifiées' },
   { key: 'schemas', label: 'Schémas', verb: 'Expliquer le parcours d’accueil IAE en un schéma fidèle' },
   { key: 'images', label: 'Images', verb: 'Créer un support d’agence clair et inclusif pour les salariés en insertion' },
   { key: 'assistants', label: 'Assistants', verb: 'Comparer deux assistants sur une tâche réelle et choisir ses outils' },

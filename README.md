@@ -3,7 +3,7 @@
 Application web permettant à un formateur d'animer le **module 2** de la
 formation pratique **« Créer sa boîte à outils IA pour agir au quotidien en
 ETT / ETTI / EATT »** (7 h en deux séances de 3 h 30, hors pauses) pour 6 à
-10 permanents d'agence d'intérim d'insertion. Les bases du prompt et de l'IA
+10 permanents d'agence d'intérim d'insertion (ETTI). Les bases du prompt et de l'IA
 sont acquises au module 1 : ici, chaque participant construit, teste et
 déploie de vrais outils réutilisables pour son activité. Le formateur prépare
 la session, suit le groupe en direct, aide les personnes bloquées, lit les
@@ -28,11 +28,11 @@ distincts.
   répartitions, objectifs observables, briefs, étapes, livrables, grilles de
   réussite, trois niveaux d'aide, corrigés privés, questions de débrief et
   solutions de secours sans API d'IA.
-- **Ancrage métier ETTI** : chaque séquence vise une tâche réelle d'un
-  permanent d'agence d'intérim d'insertion (suivi de mission et point
-  prescripteur, questions sur une mission, visite d'entreprise utilisatrice,
-  parcours d'accueil IAE, support d'agence, courriel de préparation de
-  mission), indique où part le temps, ce qui est délégable et ce qui reste à
+- **Ancrage métier ETTI, c'est-à-dire intérim d'insertion** : chaque
+  séquence vise une tâche réelle d'un permanent (commande d'une entreprise
+  utilisatrice, délégation, suivi de mission et point prescripteur, questions
+  sur une mission, visite ou rendez-vous client, parcours d'accueil IAE,
+  support d'agence, courriel de préparation de délégation), indique où part le temps, ce qui est délégable et ce qui reste à
   vérifier, et fait mesurer le temps observé sans promesse générale. Faits
   métier et outils datés dans `docs/SOURCES_2026.md`.
 - **Cas fictif « Agence Horizon » (ETTI fictive)** : ressources R1 à R7, R9

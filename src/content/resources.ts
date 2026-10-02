@@ -531,6 +531,18 @@ Les définitions ci-dessous sont volontairement courtes et prudentes. Les durée
 | Prescripteur habilité | Organisme autorisé à valider l'éligibilité à un parcours IAE (par exemple France Travail ou un autre organisme habilité). La liste et les conditions relèvent des textes et de la plateforme. |
 | Auto-prescription | Possibilité, dans des conditions définies, pour une SIAE de valider elle-même l'éligibilité d'une personne sur des critères administratifs. À vérifier sur la plateforme de l'inclusion. |
 
+## L'activité : de l'intérim d'insertion
+
+| Terme | Repère simplifié |
+| --- | --- |
+| Intérim d'insertion | Cœur de l'activité d'une ETTI : comme une agence d'intérim, elle reçoit des commandes d'entreprises utilisatrices, propose des salariés intérimaires en parcours d'insertion, les délègue en mission, suit la mission et la facture ; l'accompagnement s'articule à ces missions. |
+| Commande | Besoin exprimé par une entreprise utilisatrice : poste, tâches, horaires, durée, compétences, équipements, accès au site, tuteur. Une commande n'est pas une mission confirmée tant que l'entreprise n'a pas validé la proposition. |
+| Délégation | Mise à disposition d'un salarié intérimaire sur une mission : contrat de mission d'un côté, contrat de mise à disposition de l'autre. |
+| Préparation et accueil de mission | Avant le premier jour : horaires, trajet, tenue et équipements, consignes de sécurité, tuteur, premier point de suivi. L'accueil sécurité et la formation au poste relèvent de l'entreprise utilisatrice. |
+| Suivi de mission | Points réguliers avec le salarié et l'entreprise utilisatrice, traitement des incidents, relevés d'heures, renouvellement éventuel. |
+| Relevé d'heures | Document qui atteste les heures travaillées et sert à la paie et à la facturation. Il contient des données personnelles : jamais dans un outil d'IA externe. |
+| Fin de mission | Clôture d'une mission : bilan avec le salarié et l'entreprise, suite de parcours (nouvelle mission, formation, emploi). Les indemnités et documents de fin de mission suivent les règles du travail temporaire, à vérifier auprès de la structure. |
+
 ## Contrats et relations avec l'entreprise utilisatrice
 
 | Terme | Repère simplifié |

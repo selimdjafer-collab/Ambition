@@ -232,7 +232,7 @@ function buildDemoDb(): DB {
       comfort: ((i % 4) + 1) as 1 | 2 | 3 | 4,
       used_ai_before: (['never', 'sometimes', 'often'] as const)[i % 3],
       job: DEMO_PARTICIPANTS[i].job,
-      priority_task: ['Rédiger les comptes rendus d’entretien de suivi et préparer le point prescripteur', 'Préparer les visites d’entreprises utilisatrices', 'Répondre aux questions récurrentes sur les missions', 'Créer des supports d’agence pour les salariés en insertion', 'Rédiger les courriels de préparation de mission'][i % 5],
+      priority_task: ['Rédiger les comptes rendus de suivi de mission et préparer le point prescripteur', 'Préparer les visites et rendez-vous avec les entreprises utilisatrices', 'Répondre aux questions récurrentes sur une commande ou une mission', 'Créer des supports d’agence pour les salariés intérimaires en insertion', 'Rédiger les courriels de préparation de délégation'][i % 5],
       expectations: 'Gagner en assurance sur une tâche précise et savoir ce que je dois vérifier.',
     },
     tool_access: {},
