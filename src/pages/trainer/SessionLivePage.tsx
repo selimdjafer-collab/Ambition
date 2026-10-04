@@ -51,7 +51,7 @@ export function SessionLivePage() {
           {session.status === 'open' && <Button onClick={() => run(() => backend.updateSession(session.id, { status: 'suspended' }), 'Session suspendue.')}>Suspendre</Button>}
           <Link to={`/t/sessions/${session.id}/preparer`} className="rounded-md border border-line bg-white px-3 py-2 text-sm font-medium hover:bg-surface">Préparer</Link>
           <Link to={`/t/sessions/${session.id}/rapport`} className="rounded-md border border-line bg-white px-3 py-2 text-sm font-medium hover:bg-surface">Rapport</Link>
-          <a href={`/t/sessions/${session.id}/presentation`} target="_blank" rel="noopener" className="inline-flex items-center gap-1 rounded-md border border-brand-600 bg-brand-600 text-white px-3 py-2 text-sm font-medium hover:bg-brand-700">Mode présentation <ExternalLink size={14} aria-hidden /></a>
+          <Link to={`/t/sessions/${session.id}/presentation`} target={import.meta.env.VITE_HASH_ROUTER === 'true' ? undefined : '_blank'} rel="noopener" className="inline-flex items-center gap-1 rounded-md border border-brand-600 bg-brand-600 text-white px-3 py-2 text-sm font-medium hover:bg-brand-700">Mode présentation <ExternalLink size={14} aria-hidden /></Link>
         </div>
       </div>
       {session.status !== 'open' && <Notice tone="warning">La session n’est pas ouverte : les participants ne peuvent pas déposer de production.</Notice>}

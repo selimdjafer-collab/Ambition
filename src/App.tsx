@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './auth/AuthProvider';
-import { ToastProvider, Loading } from './components/ui';
+import { ConfirmProvider, ToastProvider, Loading } from './components/ui';
 import { LoginPage } from './pages/LoginPage';
 import { ParticipantSessionsPage } from './pages/participant/ParticipantSessionsPage';
 import { ParticipantSessionHome } from './pages/participant/ParticipantSessionHome';
@@ -45,6 +45,7 @@ export default function App() {
   return (
     <AuthProvider>
       <ToastProvider>
+        <ConfirmProvider>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/connexion" element={<LoginPage />} />
@@ -74,6 +75,7 @@ export default function App() {
           <Route path="/t/parametres" element={<RequireAuth role="trainer"><SettingsPage /></RequireAuth>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </ConfirmProvider>
       </ToastProvider>
     </AuthProvider>
   );

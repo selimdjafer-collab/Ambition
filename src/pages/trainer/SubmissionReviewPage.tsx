@@ -4,7 +4,7 @@ import { useAuth } from '../../auth/AuthProvider';
 import { AppShell } from '../../components/layout/AppShell';
 import { FileList } from '../../components/production/FileDrop';
 import { ProductionReadOnly } from '../../components/production/ProductionForms';
-import { Badge, Button, Card, Checkbox, Field, Loading, Notice, Select, Textarea, formatDate, useToast } from '../../components/ui';
+import { Badge, Button, Card, Checkbox, Field, Loading, Notice, Select, Textarea, formatDate, useConfirm, useToast } from '../../components/ui';
 import { useAsync } from '../../hooks/useAsync';
 import { useSessionData } from '../../hooks/useSessionData';
 import { rubricMax, rubricSuggestion } from '../../lib/rubric';
@@ -15,6 +15,7 @@ export function SubmissionReviewPage() {
   const { sessionId, submissionId } = useParams();
   const { backend } = useAuth();
   const toast = useToast();
+  const confirm = useConfirm();
   const navigate = useNavigate();
   const { data, error, profileName } = useSessionData(sessionId);
   const versions = useAsync(() => (submissionId ? backend.listVersions(submissionId) : Promise.resolve([])), [backend, submissionId, data?.submissions.find((s) => s.id === submissionId)?.current_version]);
@@ -73,7 +74,7 @@ export function SubmissionReviewPage() {
         </div>
         <div className="flex gap-2 flex-wrap">
           {sub.share_consent ? <Badge tone="success">Partage autorisé par l’auteur</Badge> : <Badge tone="neutral">Partage non autorisé</Badge>}
-          <Button variant="danger" onClick={async () => { if (!confirm('Supprimer cette production, ses versions et ses fichiers ? Cette action est contrôlée et définitive.')) return; try { await backend.deleteSubmission(sub.id); navigate(`/t/sessions/${data.session.id}/animer`); } catch (e) { toast(e instanceof Error ? e.message : String(e), 'error'); } }}>Supprimer</Button>
+          <Button variant="danger" onClick={async () => { if (!(await confirm('Supprimer cette production, ses versions et ses fichiers ? Cette action est contrôlée et définitive.', { confirmLabel: 'Supprimer' }))) return; try { await backend.deleteSubmission(sub.id); navigate(`/t/sessions/${data.session.id}/animer`); } catch (e) { toast(e instanceof Error ? e.message : String(e), 'error'); } }}>Supprimer</Button>
         </div>
       </div>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_24rem]">

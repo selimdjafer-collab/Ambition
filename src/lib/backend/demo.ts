@@ -453,7 +453,11 @@ export class DemoBackend implements Backend {
 
   constructor() {
     this.db = this.load();
-    this.currentUserId = sessionStorage.getItem(USER_KEY);
+    try {
+      this.currentUserId = sessionStorage.getItem(USER_KEY);
+    } catch {
+      this.currentUserId = null;
+    }
     if (this.currentUserId && !this.db.users.some((u) => u.id === this.currentUserId)) this.currentUserId = null;
     window.addEventListener('storage', (e) => {
       if (e.key === STORAGE_KEY) {
@@ -495,7 +499,11 @@ export class DemoBackend implements Backend {
   }
 
   private save(): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
+    } catch {
+      /* stockage indisponible (navigation privée, quota) : la session reste en mémoire */
+    }
   }
 
   private emit(...tables: RealtimeTable[]): void {
@@ -580,8 +588,12 @@ export class DemoBackend implements Backend {
 
   private setUser(id: string | null): void {
     this.currentUserId = id;
-    if (id) sessionStorage.setItem(USER_KEY, id);
-    else sessionStorage.removeItem(USER_KEY);
+    try {
+      if (id) sessionStorage.setItem(USER_KEY, id);
+      else sessionStorage.removeItem(USER_KEY);
+    } catch {
+      /* ignore */
+    }
     const u = this.db.users.find((x) => x.id === id);
     this.authListeners.forEach((l) => l(u ? { id: u.id, email: u.email } : null));
   }

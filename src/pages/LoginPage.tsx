@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { Brand } from '../components/layout/AppShell';
-import { Button, Card, Field, Input, Notice, Tabs, useToast } from '../components/ui';
+import { Button, Card, Field, Input, Notice, Tabs, useConfirm, useToast } from '../components/ui';
 import { DemoBackend, DEMO_PASSWORD } from '../lib/backend/demo';
 import { SUPABASE_CONFIGURED } from '../lib/backend';
 
@@ -11,6 +11,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
+  const confirm = useConfirm();
   const [tab, setTab] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -112,8 +113,8 @@ export function LoginPage() {
             <Button
               size="sm"
               variant="danger"
-              onClick={() => {
-                if (confirm('Réinitialiser toutes les données de démonstration de ce navigateur ?')) {
+              onClick={async () => {
+                if (await confirm('Réinitialiser toutes les données de démonstration de ce navigateur ?', { confirmLabel: 'Réinitialiser' })) {
                   demo.resetDemo();
                   toast('Données de démonstration réinitialisées.', 'success');
                 }

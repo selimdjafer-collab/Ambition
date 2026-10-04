@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthProvider';
 import { AppShell } from '../../components/layout/AppShell';
-import { Badge, Button, Card, Checkbox, Field, Input, Loading, Notice, Select, Tabs, Textarea, formatDate, useToast } from '../../components/ui';
+import { Badge, Button, Card, Checkbox, Field, Input, Loading, Notice, Select, Tabs, Textarea, formatDate, useConfirm, useToast } from '../../components/ui';
 import { useAsync } from '../../hooks/useAsync';
 import { useSessionData } from '../../hooks/useSessionData';
 import { parseRosterCsv } from '../../lib/csv';
@@ -56,6 +56,7 @@ export function SessionPreparePage() {
 function SettingsTab({ session }: { session: Session }) {
   const { backend } = useAuth();
   const toast = useToast();
+  const confirm = useConfirm();
   const [f, setF] = useState({ title: session.title, mode: session.mode, start_date: session.start_date ?? '', end_date: session.end_date ?? '', meeting_link: session.meeting_link ?? '', max_participants: session.max_participants, resources_access: session.resources_access, peer_review_enabled: session.peer_review_enabled, retention: session.retention });
   const [busy, setBusy] = useState(false);
   const ret = (k: keyof Retention, v: string) => setF({ ...f, retention: { ...f.retention, [k]: v === '' ? null : Number(v) } });
@@ -82,7 +83,7 @@ function SettingsTab({ session }: { session: Session }) {
       </div>
       <div className="mt-4 flex gap-2 flex-wrap">
         <Button variant="primary" busy={busy} onClick={async () => { setBusy(true); try { await backend.updateSession(session.id, { title: f.title, mode: f.mode, start_date: f.start_date || null, end_date: f.end_date || null, meeting_link: f.meeting_link || null, max_participants: f.max_participants, resources_access: f.resources_access, peer_review_enabled: f.peer_review_enabled, retention: f.retention }); toast('Paramètres enregistrés.', 'success'); } catch (e) { toast(e instanceof Error ? e.message : String(e), 'error'); } finally { setBusy(false); } }}>Enregistrer</Button>
-        <Button variant="danger" onClick={async () => { if (!confirm('Supprimer définitivement cette session, ses productions et ses fichiers ?')) return; try { await backend.deleteSession(session.id); location.assign('/t/sessions'); } catch (e) { toast(e instanceof Error ? e.message : String(e), 'error'); } }}>Supprimer la session</Button>
+        <Button variant="danger" onClick={async () => { if (!(await confirm('Supprimer définitivement cette session, ses productions et ses fichiers ?', { confirmLabel: 'Supprimer' }))) return; try { await backend.deleteSession(session.id); location.assign('/t/sessions'); } catch (e) { toast(e instanceof Error ? e.message : String(e), 'error'); } }}>Supprimer la session</Button>
       </div>
     </Card>
   );

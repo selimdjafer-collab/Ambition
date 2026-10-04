@@ -6,7 +6,7 @@ import { ToolSpecForm, type ToolSpec } from '../../components/toolbox/ToolSpecFo
 import { ToolTester } from '../../components/toolbox/ToolTester';
 import { ToolHeader, ToolSheet } from '../../components/toolbox/ToolCardItem';
 import { EMPTY_BLUEPRINT, sharedToBlueprint, toolboxToMarkdown } from '../../components/toolbox/toolbox';
-import { Button, Card, Checkbox, EmptyState, Loading, Modal, Notice, Select, useToast } from '../../components/ui';
+import { Button, Card, Checkbox, EmptyState, Loading, Modal, Notice, Select, useConfirm, useToast } from '../../components/ui';
 import { useAsync } from '../../hooks/useAsync';
 import { useSessionData } from '../../hooks/useSessionData';
 import { downloadText } from '../../lib/csv';
@@ -17,6 +17,7 @@ export function ToolboxPage() {
   const [params] = useSearchParams();
   const { backend, user, profile } = useAuth();
   const toast = useToast();
+  const confirm = useConfirm();
   const { data, error, teamOf, profileName } = useSessionData(sessionId);
   const tools = useAsync(() => backend.listToolCards(), [backend]);
   const [editing, setEditing] = useState<{ item: ToolboxItem | null; spec: ToolSpec; workshopId: string | null; fromShared?: string } | null>(null);
@@ -109,7 +110,7 @@ export function ToolboxPage() {
                   <Button size="sm" onClick={() => { setEditing({ item: t, workshopId: t.session_workshop_id, spec: { name: t.name, family: t.family, purpose: t.purpose, inputs: t.inputs, instructions: t.instructions, prompt_template: t.prompt_template, output_format: t.output_format, verification: t.verification, data_rules: t.data_rules, fallback: t.fallback, tool_used: t.tool_used, deploy_plan: t.deploy_plan } }); setNewVersion(false); }} disabled={!editable}>Modifier</Button>
                   {t.status === 'tested' && <Button size="sm" onClick={() => setStatus(t, 'ready')} disabled={!editable}>Marquer « prêt à proposer »</Button>}
                   {t.status === 'ready' && <Button size="sm" onClick={() => setStatus(t, 'tested')} disabled={!editable}>Repasser en « testé »</Button>}
-                  <Button size="sm" variant="danger" onClick={async () => { if (confirm('Supprimer cet outil et ses versions ?')) await backend.deleteToolboxItem(t.id); }} disabled={!editable || t.owner_id !== user.id}>Supprimer</Button>
+                  <Button size="sm" variant="danger" onClick={async () => { if (await confirm('Supprimer cet outil et ses versions ?', { confirmLabel: 'Supprimer' })) await backend.deleteToolboxItem(t.id); }} disabled={!editable || t.owner_id !== user.id}>Supprimer</Button>
                   <Button size="sm" variant="ghost" onClick={() => setOpened(opened === t.id ? null : t.id)}>{opened === t.id ? 'Replier' : 'Fiche complète'}</Button>
                 </div>
                 <div className="mt-2"><Checkbox label="J’autorise le formateur à partager cet outil au groupe (copie de la fiche, sans mes tests ni commentaires)." checked={t.share_consent} disabled={!editable} onChange={(v) => backend.updateToolboxItem(t.id, { share_consent: v }).catch((e) => toast(String(e), 'error'))} /></div>

@@ -268,6 +268,35 @@ export function useToast() {
   return useContext(ToastCtx);
 }
 
+// --- Confirmation intégrée (les dialogues natifs ne sont pas toujours disponibles) ---
+type ConfirmFn = (message: string, options?: { confirmLabel?: string; danger?: boolean }) => Promise<boolean>;
+const ConfirmCtx = createContext<ConfirmFn>(() => Promise.resolve(false));
+
+export function ConfirmProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<{ message: string; confirmLabel: string; danger: boolean; resolve: (v: boolean) => void } | null>(null);
+  const confirm = useCallback<ConfirmFn>((message, options) => new Promise((resolve) => setState({ message, confirmLabel: options?.confirmLabel ?? 'Confirmer', danger: options?.danger ?? true, resolve })), []);
+  const close = (v: boolean) => {
+    state?.resolve(v);
+    setState(null);
+  };
+  return (
+    <ConfirmCtx.Provider value={confirm}>
+      {children}
+      <Modal open={!!state} onClose={() => close(false)} title="Confirmation">
+        <p className="mb-4">{state?.message}</p>
+        <div className="flex gap-2 justify-end">
+          <Button onClick={() => close(false)}>Annuler</Button>
+          <Button variant={state?.danger ? 'danger' : 'primary'} onClick={() => close(true)}>{state?.confirmLabel}</Button>
+        </div>
+      </Modal>
+    </ConfirmCtx.Provider>
+  );
+}
+
+export function useConfirm(): ConfirmFn {
+  return useContext(ConfirmCtx);
+}
+
 // --- Markdown minimal (titres, listes, tableaux, gras) -------------------
 export function Markdown({ text, className }: { text: string; className?: string }) {
   const html = useMemo(() => renderMarkdown(text), [text]);

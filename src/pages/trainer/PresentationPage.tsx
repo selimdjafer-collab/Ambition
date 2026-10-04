@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { TimerDisplay } from '../../components/TimerDisplay';
 import { Brand } from '../../components/layout/AppShell';
 import { Loading, Markdown, Notice, cx } from '../../components/ui';
@@ -61,7 +61,10 @@ export function PresentationPage() {
               <ul className="mt-2 space-y-1">{res.map((r) => <li key={r.id}><span className="text-brand-700 font-semibold">{r.code}</span> {r.title}{r.obsolete ? ' (ancienne version)' : ''}</li>)}{res.length === 0 && <li className="text-muted">Aucune ressource spécifique.</li>}</ul>
               <p className="text-base text-muted mt-2">Cas fictif « Agence Horizon » — aucune donnée réelle.</p>
             </section>
-            <button type="button" className="rounded-md border border-line px-4 py-2 text-base" onClick={() => setShowDebrief((s) => !s)}>{showDebrief ? 'Afficher la consigne' : 'Afficher le débrief'}</button>
+            <div className="flex gap-3 flex-wrap">
+              <button type="button" className="rounded-md border border-line px-4 py-2 text-base" onClick={() => setShowDebrief((s) => !s)}>{showDebrief ? 'Afficher la consigne' : 'Afficher le débrief'}</button>
+              <Link to={`/t/sessions/${session.id}/animer`} className="rounded-md border border-line px-4 py-2 text-base text-muted">Quitter la présentation</Link>
+            </div>
           </aside>
         </main>
       )}

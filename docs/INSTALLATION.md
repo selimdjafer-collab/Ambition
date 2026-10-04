@@ -82,6 +82,15 @@ pnpm test            # vérifie 420 minutes, cohérence des répartitions, seed 
 Pour une base existante, préférez l'éditeur de programme dans l'application
 (brouillon → publication) : les sessions déjà créées conservent leur instantané.
 
+## Build de démonstration statique
+
+```bash
+pnpm build:demo   # dist-demo/ : mode démo forcé, routage par ancre (#/…), base relative
+```
+
+Ce build se dépose sur n'importe quel hébergement de fichiers statiques sans
+réécriture d'URL. Il ne contient aucune clé et n'écrit rien sur un serveur.
+
 ## Mode démo
 
 - Comptes : « Formatrice démo » et dix participants fictifs, mot de passe `demo`,
