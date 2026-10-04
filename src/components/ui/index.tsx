@@ -10,11 +10,11 @@ export function cx(...parts: (string | false | null | undefined)[]): string {
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'accent';
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700 border-brand-600',
-  accent: 'bg-accent text-white hover:brightness-90 border-accent',
+  primary: 'bg-brand-600 text-white hover:bg-brand-700 border-brand-600 shadow-sm',
+  accent: 'bg-accent text-white hover:bg-accent-600 border-accent shadow-sm',
   secondary: 'bg-white text-ink hover:bg-surface border-line',
   ghost: 'bg-transparent text-brand-700 hover:bg-brand-50 border-transparent',
-  danger: 'bg-white text-red-700 hover:bg-red-50 border-red-300',
+  danger: 'bg-white text-red-700 hover:bg-red-50 border-red-200',
 };
 
 export function Button({
@@ -25,7 +25,7 @@ export function Button({
   busy,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: 'sm' | 'md' | 'lg'; busy?: boolean }) {
-  const sizes = { sm: 'px-2.5 py-1 text-sm', md: 'px-4 py-2', lg: 'px-6 py-3 text-lg' };
+  const sizes = { sm: 'px-3 py-1.5 text-sm rounded-lg', md: 'px-4 py-2.5 rounded-xl', lg: 'px-6 py-3 text-lg rounded-xl' };
   return (
     <button
       type="button"
@@ -33,7 +33,7 @@ export function Button({
       disabled={rest.disabled || busy}
       aria-busy={busy || undefined}
       className={cx(
-        'inline-flex items-center justify-center gap-2 rounded-md border font-medium transition disabled:opacity-50 disabled:cursor-not-allowed',
+        'inline-flex items-center justify-center gap-2 border font-semibold transition active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed disabled:active:translate-y-0',
         variants[variant],
         sizes[size],
         className,
@@ -46,9 +46,9 @@ export function Button({
 }
 
 export function LinkButton({ to, variant = 'secondary', size = 'md', className, children }: { to: string; variant?: Variant; size?: 'sm' | 'md' | 'lg'; className?: string; children: ReactNode }) {
-  const sizes = { sm: 'px-2.5 py-1 text-sm', md: 'px-4 py-2', lg: 'px-6 py-3 text-lg' };
+  const sizes = { sm: 'px-3 py-1.5 text-sm rounded-lg', md: 'px-4 py-2.5 rounded-xl', lg: 'px-6 py-3 text-lg rounded-xl' };
   return (
-    <Link to={to} className={cx('inline-flex items-center justify-center gap-2 rounded-md border font-medium transition', variants[variant], sizes[size], className)}>
+    <Link to={to} className={cx('inline-flex items-center justify-center gap-2 border font-semibold transition', variants[variant], sizes[size], className)}>
       {children}
     </Link>
   );
@@ -57,10 +57,10 @@ export function LinkButton({ to, variant = 'secondary', size = 'md', className, 
 // --- Surfaces --------------------------------------------------------------
 export function Card({ title, children, className, actions, as: Tag = 'section' }: { title?: ReactNode; children: ReactNode; className?: string; actions?: ReactNode; as?: 'section' | 'div' | 'article' }) {
   return (
-    <Tag className={cx('bg-white rounded-lg border border-line p-4 sm:p-5 shadow-sm', className)}>
+    <Tag className={cx('bg-white rounded-2xl border border-line/80 p-5 sm:p-6 shadow-card', className)}>
       {(title || actions) && (
-        <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
-          {title && <h2 className="text-lg font-semibold">{title}</h2>}
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+          {title && <h2 className="text-lg font-semibold leading-snug">{title}</h2>}
           {actions && <div className="flex gap-2 flex-wrap">{actions}</div>}
         </div>
       )}
@@ -71,25 +71,31 @@ export function Card({ title, children, className, actions, as: Tag = 'section' 
 
 export function Badge({ children, tone = 'neutral', className }: { children: ReactNode; tone?: 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'brand'; className?: string }) {
   const tones = {
-    neutral: 'bg-gray-100 text-gray-800 border-gray-300',
-    info: 'bg-blue-50 text-blue-900 border-blue-300',
-    success: 'bg-green-50 text-green-900 border-green-300',
-    warning: 'bg-amber-50 text-amber-900 border-amber-300',
-    danger: 'bg-red-50 text-red-900 border-red-300',
+    neutral: 'bg-surface-2 text-ink border-transparent',
+    info: 'bg-sky-50 text-sky-900 border-sky-100',
+    success: 'bg-emerald-50 text-emerald-900 border-emerald-100',
+    warning: 'bg-amber-50 text-amber-ink border-amber-100',
+    danger: 'bg-red-50 text-red-900 border-red-100',
     brand: 'bg-brand-50 text-brand-700 border-brand-100',
   };
-  return <span className={cx('inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-sm font-medium', tones[tone], className)}>{children}</span>;
+  const dots = { neutral: 'bg-gray-400', info: 'bg-sky-500', success: 'bg-emerald-500', warning: 'bg-amber-500', danger: 'bg-red-500', brand: 'bg-brand-500' };
+  return (
+    <span className={cx('inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap', tones[tone], className)}>
+      <span aria-hidden className={cx('h-1.5 w-1.5 rounded-full', dots[tone])} />
+      {children}
+    </span>
+  );
 }
 
 export function Notice({ children, tone = 'info', title }: { children: ReactNode; tone?: 'info' | 'warning' | 'danger' | 'success'; title?: string }) {
   const tones = {
-    info: 'bg-blue-50 border-blue-300 text-blue-950',
-    warning: 'bg-amber-50 border-amber-300 text-amber-950',
-    danger: 'bg-red-50 border-red-300 text-red-950',
-    success: 'bg-green-50 border-green-300 text-green-950',
+    info: 'bg-sky-50 border-sky-400 text-sky-950',
+    warning: 'bg-amber-50 border-amber-400 text-amber-950',
+    danger: 'bg-red-50 border-red-400 text-red-950',
+    success: 'bg-emerald-50 border-emerald-400 text-emerald-950',
   };
   return (
-    <div role={tone === 'danger' ? 'alert' : 'note'} className={cx('rounded-md border px-3 py-2 text-sm', tones[tone])}>
+    <div role={tone === 'danger' ? 'alert' : 'note'} className={cx('rounded-xl border-l-4 px-4 py-3 text-sm my-3', tones[tone])}>
       {title && <strong className="block mb-0.5">{title}</strong>}
       {children}
     </div>
@@ -117,7 +123,7 @@ export function Field({ label, hint, error, children, required }: { label: strin
   const id = useId();
   return (
     <div className="space-y-1">
-      <label htmlFor={id} className="block font-medium">
+      <label htmlFor={id} className="block text-sm font-semibold">
         {label} {required && <span aria-hidden className="text-accent">*</span>}
       </label>
       {hint && (
@@ -135,7 +141,7 @@ export function Field({ label, hint, error, children, required }: { label: strin
   );
 }
 
-const inputCls = 'w-full rounded-md border border-line bg-white px-3 py-2 disabled:bg-surface disabled:text-muted';
+const inputCls = 'w-full rounded-lg border border-line bg-white px-3 py-2.5 shadow-[inset_0_1px_2px_rgba(22,34,46,0.04)] placeholder:text-muted/70 focus:border-brand-500 disabled:bg-surface disabled:text-muted';
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={cx(inputCls, props.className)} />;
@@ -217,7 +223,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
 // --- Onglets ---------------------------------------------------------------
 export function Tabs<T extends string>({ tabs, value, onChange, label }: { tabs: { key: T; label: ReactNode }[]; value: T; onChange: (k: T) => void; label: string }) {
   return (
-    <div role="tablist" aria-label={label} className="flex flex-wrap gap-1 border-b border-line mb-4">
+    <div role="tablist" aria-label={label} className="inline-flex flex-wrap gap-1 rounded-xl bg-surface-2 p-1 mb-4">
       {tabs.map((t) => (
         <button
           key={t.key}
@@ -225,7 +231,7 @@ export function Tabs<T extends string>({ tabs, value, onChange, label }: { tabs:
           type="button"
           aria-selected={value === t.key}
           onClick={() => onChange(t.key)}
-          className={cx('px-3 py-2 -mb-px border-b-2 font-medium', value === t.key ? 'border-brand-600 text-brand-700' : 'border-transparent text-muted hover:text-ink')}
+          className={cx('px-3.5 py-1.5 rounded-lg text-sm font-semibold transition', value === t.key ? 'bg-white text-brand-700 shadow-sm' : 'text-muted hover:text-ink')}
         >
           {t.label}
         </button>
